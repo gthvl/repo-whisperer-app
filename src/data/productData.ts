@@ -171,7 +171,7 @@ export const productData: ProductData = {
   ],
   shippingInfo: {
     method: "Padrão",
-    estimate: "13-17 de mar",
+    estimate: "23-27 de mar",
     cost: "Grátis",
   },
   footer: {
