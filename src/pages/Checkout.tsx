@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { trackTikTokEvent } from "@/lib/tiktokPixel";
-import { FreeShippingBanner } from "@/components/FreeShippingBanner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -21,19 +20,16 @@ import {
   Zap,
   Copy,
   CheckCircle,
-  Loader2,
   Package,
   Clock,
 } from "lucide-react";
 
 interface AddressData {
   fullName: string;
-  email: string;
-  cep: string;
-  address: string;
+  phone: string;
+  streetNumber: string;
   city: string;
   state: string;
-  whatsapp: string;
 }
 
 const generateOrderNumber = () => {
@@ -118,29 +114,25 @@ const Checkout = () => {
   const countdownDisplay = `${countdownMin}:${countdownSec}`;
 
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [geoCity, setGeoCity] = useState("");
+  const [geoState, setGeoState] = useState("");
   const [addressData, setAddressData] = useState<AddressData>({
-    fullName: "", email: "", cep: "", address: "", city: "", state: "", whatsapp: "",
+    fullName: "", phone: "", streetNumber: "", city: "", state: "",
   });
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
-  const [cepLoading, setCepLoading] = useState(false);
 
-  const fetchCepData = async (cep: string) => {
-    const digits = cep.replace(/\D/g, "");
-    if (digits.length !== 8) return;
-    setCepLoading(true);
-    try {
-      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
-      const data = await res.json();
-      if (!data.erro) {
-        setAddressData((prev) => ({
-          ...prev,
-          address: data.logradouro ? `${data.logradouro}${data.bairro ? `, ${data.bairro}` : ""}` : prev.address,
-          city: data.localidade || "",
-          state: data.uf || "",
-        }));
-      }
-    } catch {} finally { setCepLoading(false); }
-  };
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.city && data.region) {
+          setGeoCity(data.city);
+          setGeoState(data.region);
+          setAddressData((p) => ({ ...p, city: data.city, state: data.region }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const shippingCost = shippingMethod === "premium" ? 17.50 : 0;
   const pixDiscount = paymentMethod === "pix" ? price * quantity * 0.05 : 0;
@@ -154,11 +146,6 @@ const Checkout = () => {
   const formatExpiry = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 4);
     if (digits.length > 2) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-    return digits;
-  };
-  const formatCep = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 8);
-    if (digits.length > 5) return `${digits.slice(0, 5)}-${digits.slice(5)}`;
     return digits;
   };
   const formatWhatsapp = (value: string) => {
@@ -176,7 +163,7 @@ const Checkout = () => {
   };
 
   const handleSaveAddress = async () => {
-    if (!addressData.fullName || !addressData.cep || !addressData.address || !addressData.whatsapp) return;
+    if (!addressData.fullName || !addressData.phone || !addressData.streetNumber) return;
     setSavedAddress({ ...addressData });
     setShowAddressModal(false);
   };
@@ -406,22 +393,20 @@ const Checkout = () => {
             <X className="w-4 h-4 text-foreground" />
           </button>
         </div>
+        {/* Auto-detected location */}
+        {(addressData.city || addressData.state) && (
+          <div className="mx-4 mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/20">
+            <MapPin className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-[12px] text-foreground">
+              Frete grátis para: <strong>{addressData.city}{addressData.state ? `, ${addressData.state}` : ""}</strong>
+            </span>
+          </div>
+        )}
         <div className="px-4 pb-6 space-y-3">
           <input className={inputClass} placeholder="Nome completo" value={addressData.fullName} onChange={(e) => setAddressData((p) => ({ ...p, fullName: e.target.value }))} />
-          <input className={inputClass} placeholder="E-mail" type="email" value={addressData.email} onChange={(e) => setAddressData((p) => ({ ...p, email: e.target.value }))} />
-          <div className="relative">
-            <input className={inputClass} placeholder="CEP" value={addressData.cep}
-              onChange={(e) => { const formatted = formatCep(e.target.value); setAddressData((p) => ({ ...p, cep: formatted })); if (formatted.replace(/\D/g, "").length === 8) fetchCepData(formatted); }}
-            />
-            {cepLoading && <Loader2 className="absolute right-3 top-3 w-4 h-4 animate-spin text-muted-foreground" />}
-          </div>
-          <input className={inputClass} placeholder="Endereço completo" value={addressData.address} onChange={(e) => setAddressData((p) => ({ ...p, address: e.target.value }))} />
-          <div className="grid grid-cols-2 gap-3">
-            <input className={inputClass} placeholder="Cidade" value={addressData.city} onChange={(e) => setAddressData((p) => ({ ...p, city: e.target.value }))} />
-            <input className={inputClass} placeholder="Estado" value={addressData.state} onChange={(e) => setAddressData((p) => ({ ...p, state: e.target.value }))} />
-          </div>
-          <input className={inputClass} placeholder="WhatsApp (11) 99999-9999" value={addressData.whatsapp} onChange={(e) => setAddressData((p) => ({ ...p, whatsapp: formatWhatsapp(e.target.value) }))} />
-          <button onClick={handleSaveAddress} disabled={!addressData.fullName || !addressData.cep || !addressData.address || !addressData.whatsapp}
+          <input className={inputClass} placeholder="Telefone (11) 99999-9999" value={addressData.phone} onChange={(e) => setAddressData((p) => ({ ...p, phone: formatWhatsapp(e.target.value) }))} />
+          <input className={inputClass} placeholder="Número da rua" value={addressData.streetNumber} onChange={(e) => setAddressData((p) => ({ ...p, streetNumber: e.target.value }))} />
+          <button onClick={handleSaveAddress} disabled={!addressData.fullName || !addressData.phone || !addressData.streetNumber}
             className="w-full tiktok-btn-primary h-12 rounded-full text-[14px] font-bold disabled:opacity-50 mt-1">
             Salvar endereço
           </button>
@@ -434,7 +419,7 @@ const Checkout = () => {
   // ─── Main Checkout ───
   return (
     <div className="min-h-[100dvh] bg-background pb-[140px]">
-      <FreeShippingBanner />
+      {/* Header */}
       {/* Header */}
       <div className="sticky top-0 z-50 bg-card">
         <div className="flex items-center h-11 px-3 relative">
@@ -467,12 +452,14 @@ const Checkout = () => {
             {savedAddress ? (
               <>
                 <p className="text-[13px] font-semibold text-foreground truncate">{savedAddress.fullName}</p>
-                <p className="text-[11px] text-muted-foreground truncate">{savedAddress.address}, {savedAddress.city} - {savedAddress.state}</p>
+                <p className="text-[11px] text-muted-foreground truncate">Nº {savedAddress.streetNumber} · {savedAddress.city}, {savedAddress.state}</p>
               </>
             ) : (
               <>
                 <p className="text-[13px] font-semibold text-primary">Adicionar endereço</p>
-                <p className="text-[11px] text-muted-foreground">Toque para informar o endereço de entrega</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {geoCity ? `Frete grátis para: ${geoCity}, ${geoState}` : "Toque para informar o endereço de entrega"}
+                </p>
               </>
             )}
           </div>
@@ -667,7 +654,7 @@ const Checkout = () => {
               disabled={pixLoading || finalizingPayment}
               className="w-full tiktok-btn-primary h-[48px] rounded-full text-[15px] font-bold disabled:opacity-60 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
-              {(pixLoading || finalizingPayment) && <Loader2 className="w-4 h-4 animate-spin" />}
+              {(pixLoading || finalizingPayment) && <Clock className="w-4 h-4 animate-spin" />}
               {pixLoading ? "Gerando PIX..." : finalizingPayment ? "Processando..." : paymentMethod === "credit" ? "Pagar com Cartão" : "Pagar com PIX"}
             </button>
           </div>
