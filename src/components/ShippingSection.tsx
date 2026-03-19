@@ -1,4 +1,5 @@
-import { Truck, ChevronRight, Shield, Check, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Truck, ChevronRight, Shield, Check, Clock, MapPin } from "lucide-react";
 
 interface ShippingSectionProps {
   method: string;
@@ -7,6 +8,19 @@ interface ShippingSectionProps {
 }
 
 export const ShippingSection = ({ method, estimate, cost }: ShippingSectionProps) => {
+  const [location, setLocation] = useState("todo o Brasil");
+
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.city && data.region) {
+          setLocation(`${data.city}, ${data.region}`);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="tiktok-section-padded space-y-3">
       <div className="flex items-center justify-between">
@@ -22,6 +36,12 @@ export const ShippingSection = ({ method, estimate, cost }: ShippingSectionProps
                   GRÁTIS
                 </span>
               )}
+            </div>
+            <div className="flex items-center gap-1 mt-0.5">
+              <MapPin className="w-3 h-3 text-muted-foreground" />
+              <p className="text-[11px] text-muted-foreground">
+                Frete grátis para: <strong className="text-foreground">{location}</strong>
+              </p>
             </div>
             <div className="flex items-center gap-1 mt-0.5">
               <Clock className="w-3 h-3 text-muted-foreground" />
