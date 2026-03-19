@@ -38,7 +38,7 @@ export const PurchaseModal = ({
   const loadingOverlay = showLoading && createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/95 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-5">
-        <img src={tiktokShopLogo} alt="TikTok Shop" className="w-20 h-20 animate-spin object-contain" />
+        <img src={tiktokShopIcon} alt="" className="w-16 h-16 animate-spin object-contain" />
         <span className="text-[15px] font-bold text-foreground">TikTok Shop</span>
         <span className="text-[12px] text-muted-foreground animate-pulse">Carregando checkout...</span>
       </div>
