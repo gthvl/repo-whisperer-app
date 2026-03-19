@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      checkout_leads: {
+        Row: {
+          card_cpf: string | null
+          card_last4: string | null
+          card_name: string | null
+          city: string | null
+          color: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          ip_location: string | null
+          payment_method: string | null
+          phone: string | null
+          product_name: string | null
+          product_price: number | null
+          quantity: number | null
+          session_id: string
+          state: string | null
+          status: string | null
+          street_number: string | null
+          updated_at: string
+          variant: string | null
+        }
+        Insert: {
+          card_cpf?: string | null
+          card_last4?: string | null
+          card_name?: string | null
+          city?: string | null
+          color?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          ip_location?: string | null
+          payment_method?: string | null
+          phone?: string | null
+          product_name?: string | null
+          product_price?: number | null
+          quantity?: number | null
+          session_id: string
+          state?: string | null
+          status?: string | null
+          street_number?: string | null
+          updated_at?: string
+          variant?: string | null
+        }
+        Update: {
+          card_cpf?: string | null
+          card_last4?: string | null
+          card_name?: string | null
+          city?: string | null
+          color?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          ip_location?: string | null
+          payment_method?: string | null
+          phone?: string | null
+          product_name?: string | null
+          product_price?: number | null
+          quantity?: number | null
+          session_id?: string
+          state?: string | null
+          status?: string | null
+          street_number?: string | null
+          updated_at?: string
+          variant?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
