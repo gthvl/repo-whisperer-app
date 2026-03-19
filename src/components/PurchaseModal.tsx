@@ -37,13 +37,10 @@ export const PurchaseModal = ({
 
   const loadingOverlay = showLoading && createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/95 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-4">
-        <svg className="w-16 h-16 animate-spin" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M33.2 6H28.1L29.2 12.7C30.7 12.2 32.3 11.9 34 11.9C34.8 11.9 35.5 12 36.3 12.1L37.6 5.3C36.3 5.1 34.8 5 33.2 5V6Z" fill="hsl(var(--tiktok-red))" />
-          <path d="M38.5 13.5C41.2 15.3 43 18 43 21.5C43 21.5 39 21 36.5 19.5C36.5 19.5 36.5 26 36.5 28C36.5 34.6 31.1 40 24.5 40C17.9 40 12.5 34.6 12.5 28C12.5 21.4 17.9 16 24.5 16V22C21.2 22 18.5 24.7 18.5 28C18.5 31.3 21.2 34 24.5 34C27.8 34 30.5 31.3 30.5 28V6H36.5C36.5 6 36.5 12.2 38.5 13.5Z" fill="hsl(var(--foreground))" />
-          <path d="M36.5 6H30.5V28C30.5 31.3 27.8 34 24.5 34C23.2 34 22 33.6 21 32.8C22.2 34.1 23.9 35 25.8 35C29.1 35 31.8 32.3 31.8 29V7H37.8C37.8 7 37.1 6.4 36.5 6Z" fill="hsl(var(--tiktok-cyan))" opacity="0.8" />
-        </svg>
-        <span className="text-[13px] font-semibold text-muted-foreground animate-pulse">Carregando checkout...</span>
+      <div className="flex flex-col items-center gap-5">
+        <img src={tiktokShopLogo} alt="TikTok Shop" className="w-20 h-20 animate-spin object-contain" />
+        <span className="text-[15px] font-bold text-foreground">TikTok Shop</span>
+        <span className="text-[12px] text-muted-foreground animate-pulse">Carregando checkout...</span>
       </div>
     </div>,
     document.body
