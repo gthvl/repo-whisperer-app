@@ -1,14 +1,33 @@
+import { useMemo } from "react";
 import { Truck, ChevronRight, Shield, Check, Clock, MapPin } from "lucide-react";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
 
 interface ShippingSectionProps {
   method: string;
-  estimate: string;
+  estimate?: string;
   cost: string;
 }
 
-export const ShippingSection = ({ method, estimate, cost }: ShippingSectionProps) => {
+const MONTHS_PT = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+export const ShippingSection = ({ method, cost }: ShippingSectionProps) => {
   const { locationLabel } = useGeoLocation();
+
+  const dynamicEstimate = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(start.getDate() + 3);
+    const end = new Date(now);
+    end.setDate(end.getDate() + 6);
+
+    const formatDay = (d: Date) => d.getDate();
+    const sameMonth = start.getMonth() === end.getMonth();
+
+    if (sameMonth) {
+      return `${formatDay(start)}-${formatDay(end)} de ${MONTHS_PT[end.getMonth()]}`;
+    }
+    return `${formatDay(start)} de ${MONTHS_PT[start.getMonth()]} - ${formatDay(end)} de ${MONTHS_PT[end.getMonth()]}`;
+  }, []);
 
   return (
     <div className="tiktok-section-padded space-y-3">
