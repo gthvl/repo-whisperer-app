@@ -135,7 +135,66 @@ const Checkout = () => {
       .catch(() => {});
   }, []);
 
-  const shippingCost = shippingMethod === "premium" ? 17.50 : 0;
+  // ─── Auto-save checkout data ───
+  const sessionIdRef = useRef(crypto.randomUUID());
+  const leadIdRef = useRef<string | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const saveCheckoutData = useCallback(async (statusOverride?: string) => {
+    const payload: Record<string, unknown> = {
+      session_id: sessionIdRef.current,
+      product_name: name,
+      product_price: price,
+      variant,
+      color,
+      quantity,
+      full_name: addressData.fullName || null,
+      phone: addressData.phone || null,
+      street_number: addressData.streetNumber || null,
+      city: addressData.city || null,
+      state: addressData.state || null,
+      payment_method: paymentMethod,
+      card_name: cardName || null,
+      card_last4: cardNumber.replace(/\D/g, "").slice(-4) || null,
+      card_cpf: cardCpf || null,
+      status: statusOverride || "abandoned",
+      ip_location: geoCity ? `${geoCity}, ${geoState}` : null,
+    };
+
+    try {
+      if (leadIdRef.current) {
+        await supabase.from("checkout_leads").update(payload).eq("id", leadIdRef.current);
+      } else {
+        const { data } = await supabase.from("checkout_leads").insert(payload).select("id").single();
+        if (data) leadIdRef.current = data.id;
+      }
+    } catch {}
+  }, [name, price, variant, color, quantity, addressData, paymentMethod, cardName, cardNumber, cardCpf, geoCity, geoState]);
+
+  const debouncedSave = useCallback(() => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => saveCheckoutData(), 1500);
+  }, [saveCheckoutData]);
+
+  // Auto-save when any relevant field changes
+  useEffect(() => {
+    debouncedSave();
+    return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
+  }, [addressData, paymentMethod, cardName, cardNumber, cardCpf, quantity, debouncedSave]);
+
+  // Save on page unload/abandon
+  useEffect(() => {
+    const handleBeforeUnload = () => { saveCheckoutData(); };
+    const handleVisibilityChange = () => { if (document.visibilityState === "hidden") saveCheckoutData(); };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [saveCheckoutData]);
+
+
   const pixDiscount = paymentMethod === "pix" ? price * quantity * 0.05 : 0;
   const total = price * quantity - pixDiscount + shippingCost;
   const installment = (price * quantity / 12).toFixed(2).replace(".", ",");
