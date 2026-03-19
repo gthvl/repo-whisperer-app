@@ -34,7 +34,8 @@ export const PurchaseModal = ({
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen && !showLoading) return null;
+  if (!isOpen && showLoading) return <>{loadingOverlay}</>;
 
   const currentPrice = variants[selectedVariant].price;
 
