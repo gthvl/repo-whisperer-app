@@ -1,10 +1,13 @@
 import { ArrowLeft, Share2, MoreHorizontal } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] z-50 bg-card/95 backdrop-blur-sm">
       <div className="flex items-center justify-between px-3 h-[44px]">
-        <button className="w-8 h-8 flex items-center justify-center rounded-full bg-foreground/5">
+        <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center rounded-full bg-foreground/5">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="flex items-center gap-2">
