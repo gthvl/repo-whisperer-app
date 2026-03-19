@@ -1,5 +1,5 @@
-import { ChevronRight, MessageCircle, Star, BadgeCheck } from "lucide-react";
-
+import { useState } from "react";
+import { ChevronRight, MessageCircle, Star, BadgeCheck, UserCheck } from "lucide-react";
 interface SellerSectionProps {
   name: string;
   followers: string;
