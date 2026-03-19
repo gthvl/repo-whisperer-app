@@ -3,6 +3,7 @@ import { trackTikTokEvent } from "@/lib/tiktokPixel";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
+import { useGeoLocation } from "@/hooks/useGeoLocation";
 import {
   ArrowLeft,
   ShieldCheck,
@@ -115,25 +116,29 @@ const Checkout = () => {
   const countdownDisplay = `${countdownMin}:${countdownSec}`;
 
   const [showAddressModal, setShowAddressModal] = useState(false);
-  const [geoCity, setGeoCity] = useState("");
-  const [geoState, setGeoState] = useState("");
+  const { city: geoCity, state: geoState, locationLabel } = useGeoLocation();
   const [addressData, setAddressData] = useState<AddressData>({
     fullName: "", phone: "", streetNumber: "", city: "", state: "",
   });
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
 
   useEffect(() => {
-    fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.city && data.region) {
-          setGeoCity(data.city);
-          setGeoState(data.region);
-          setAddressData((p) => ({ ...p, city: data.city, state: data.region }));
+    if (!geoCity || !geoState) return;
+
+    setAddressData((prev) => ({
+      ...prev,
+      city: prev.city || geoCity,
+      state: prev.state || geoState,
+    }));
+
+    setSavedAddress((prev) => prev
+      ? {
+          ...prev,
+          city: prev.city || geoCity,
+          state: prev.state || geoState,
         }
-      })
-      .catch(() => {});
-  }, []);
+      : prev);
+  }, [geoCity, geoState]);
 
   // ─── Auto-save checkout data ───
   const sessionIdRef = useRef(crypto.randomUUID());

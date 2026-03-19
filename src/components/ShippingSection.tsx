@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { Truck, ChevronRight, Shield, Check, Clock, MapPin } from "lucide-react";
+import { useGeoLocation } from "@/hooks/useGeoLocation";
 
 interface ShippingSectionProps {
   method: string;
@@ -8,18 +8,7 @@ interface ShippingSectionProps {
 }
 
 export const ShippingSection = ({ method, estimate, cost }: ShippingSectionProps) => {
-  const [location, setLocation] = useState("todo o Brasil");
-
-  useEffect(() => {
-    fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.city && data.region) {
-          setLocation(`${data.city}, ${data.region}`);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const { locationLabel } = useGeoLocation();
 
   return (
     <div className="tiktok-section-padded space-y-3">
