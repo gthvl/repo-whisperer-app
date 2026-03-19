@@ -229,7 +229,11 @@ const Checkout = () => {
 
   const handleSaveAddress = async () => {
     if (!addressData.fullName || !addressData.phone || !addressData.streetNumber) return;
-    setSavedAddress({ ...addressData });
+    setSavedAddress({
+      ...addressData,
+      city: addressData.city || geoCity,
+      state: addressData.state || geoState,
+    });
     setShowAddressModal(false);
   };
 
