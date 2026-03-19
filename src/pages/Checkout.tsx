@@ -27,12 +27,10 @@ import {
 
 interface AddressData {
   fullName: string;
-  email: string;
-  cep: string;
-  address: string;
+  phone: string;
+  streetNumber: string;
   city: string;
   state: string;
-  whatsapp: string;
 }
 
 const generateOrderNumber = () => {
