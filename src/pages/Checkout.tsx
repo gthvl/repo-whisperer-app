@@ -115,29 +115,25 @@ const Checkout = () => {
   const countdownDisplay = `${countdownMin}:${countdownSec}`;
 
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [geoCity, setGeoCity] = useState("");
+  const [geoState, setGeoState] = useState("");
   const [addressData, setAddressData] = useState<AddressData>({
-    fullName: "", email: "", cep: "", address: "", city: "", state: "", whatsapp: "",
+    fullName: "", phone: "", streetNumber: "", city: "", state: "",
   });
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
-  const [cepLoading, setCepLoading] = useState(false);
 
-  const fetchCepData = async (cep: string) => {
-    const digits = cep.replace(/\D/g, "");
-    if (digits.length !== 8) return;
-    setCepLoading(true);
-    try {
-      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
-      const data = await res.json();
-      if (!data.erro) {
-        setAddressData((prev) => ({
-          ...prev,
-          address: data.logradouro ? `${data.logradouro}${data.bairro ? `, ${data.bairro}` : ""}` : prev.address,
-          city: data.localidade || "",
-          state: data.uf || "",
-        }));
-      }
-    } catch {} finally { setCepLoading(false); }
-  };
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.city && data.region) {
+          setGeoCity(data.city);
+          setGeoState(data.region);
+          setAddressData((p) => ({ ...p, city: data.city, state: data.region }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const shippingCost = shippingMethod === "premium" ? 17.50 : 0;
   const pixDiscount = paymentMethod === "pix" ? price * quantity * 0.05 : 0;
