@@ -20,7 +20,6 @@ import {
   Zap,
   Copy,
   CheckCircle,
-  Loader2,
   Package,
   Clock,
 } from "lucide-react";
