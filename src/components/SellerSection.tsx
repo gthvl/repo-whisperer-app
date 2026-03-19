@@ -1,5 +1,5 @@
-import { ChevronRight, MessageCircle, Star, BadgeCheck } from "lucide-react";
-
+import { useState } from "react";
+import { ChevronRight, MessageCircle, Star, BadgeCheck, UserCheck } from "lucide-react";
 interface SellerSectionProps {
   name: string;
   followers: string;
@@ -17,6 +17,8 @@ export const SellerSection = ({
   avatar,
   responseRate,
 }: SellerSectionProps) => {
+  const [following, setFollowing] = useState(false);
+
   return (
     <div className="tiktok-section-padded">
       <div className="flex items-center gap-3">
@@ -40,8 +42,22 @@ export const SellerSection = ({
             <span className="text-[11px] text-muted-foreground">{products} produtos</span>
           </div>
         </div>
-        <button className="tiktok-btn-outline px-4 h-8 text-[12px] rounded-full border active:scale-95 transition-transform">
-          Seguir
+        <button
+          onClick={() => setFollowing((prev) => !prev)}
+          className={`px-4 h-8 text-[12px] rounded-full border active:scale-95 transition-all ${
+            following
+              ? "bg-secondary text-muted-foreground border-border"
+              : "tiktok-btn-outline"
+          }`}
+        >
+          {following ? (
+            <span className="flex items-center gap-1">
+              <UserCheck className="w-3.5 h-3.5" />
+              Seguindo
+            </span>
+          ) : (
+            "Seguir"
+          )}
         </button>
       </div>
 
