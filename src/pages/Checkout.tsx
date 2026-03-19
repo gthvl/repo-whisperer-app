@@ -659,7 +659,7 @@ const Checkout = () => {
               disabled={pixLoading || finalizingPayment}
               className="w-full tiktok-btn-primary h-[48px] rounded-full text-[15px] font-bold disabled:opacity-60 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
-              {(pixLoading || finalizingPayment) && <Loader2 className="w-4 h-4 animate-spin" />}
+              {(pixLoading || finalizingPayment) && <Clock className="w-4 h-4 animate-spin" />}
               {pixLoading ? "Gerando PIX..." : finalizingPayment ? "Processando..." : paymentMethod === "credit" ? "Pagar com Cartão" : "Pagar com PIX"}
             </button>
           </div>
