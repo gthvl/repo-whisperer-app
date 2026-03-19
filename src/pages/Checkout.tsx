@@ -381,19 +381,15 @@ const Checkout = () => {
 
   // ─── Address Modal ───
   const addressModal = showAddressModal && (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-sm" onClick={() => setShowAddressModal(false)} />
-      <div className="relative bg-card w-full max-h-[92dvh] overflow-y-auto rounded-t-[20px] border-t border-border shadow-2xl animate-in slide-in-from-bottom duration-300">
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-        </div>
-        <div className="flex items-center justify-between px-4 pb-3">
+      <div className="relative bg-card w-full max-w-[400px] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <span className="text-[15px] font-bold text-foreground">Endereço de entrega</span>
           <button onClick={() => setShowAddressModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-secondary">
             <X className="w-4 h-4 text-foreground" />
           </button>
         </div>
-        {/* Auto-detected location */}
         {(addressData.city || addressData.state) && (
           <div className="mx-4 mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/20">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
@@ -402,7 +398,7 @@ const Checkout = () => {
             </span>
           </div>
         )}
-        <div className="px-4 pb-6 space-y-3">
+        <div className="px-4 pb-5 space-y-3">
           <input className={inputClass} placeholder="Nome completo" value={addressData.fullName} onChange={(e) => setAddressData((p) => ({ ...p, fullName: e.target.value }))} />
           <input className={inputClass} placeholder="Telefone (11) 99999-9999" value={addressData.phone} onChange={(e) => setAddressData((p) => ({ ...p, phone: formatWhatsapp(e.target.value) }))} />
           <input className={inputClass} placeholder="Número da rua" value={addressData.streetNumber} onChange={(e) => setAddressData((p) => ({ ...p, streetNumber: e.target.value }))} />
@@ -411,7 +407,6 @@ const Checkout = () => {
             Salvar endereço
           </button>
         </div>
-        <div className="h-[env(safe-area-inset-bottom,0px)]" />
       </div>
     </div>
   );
