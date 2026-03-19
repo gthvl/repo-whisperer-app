@@ -194,7 +194,7 @@ const Checkout = () => {
     };
   }, [saveCheckoutData]);
 
-
+  const shippingCost = shippingMethod === "premium" ? 17.50 : 0;
   const pixDiscount = paymentMethod === "pix" ? price * quantity * 0.05 : 0;
   const total = price * quantity - pixDiscount + shippingCost;
   const installment = (price * quantity / 12).toFixed(2).replace(".", ",");
