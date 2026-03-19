@@ -32,6 +32,7 @@ export const PurchaseModal = ({
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
+  const [showLoading, setShowLoading] = useState(false);
 
   if (!isOpen) return null;
 
