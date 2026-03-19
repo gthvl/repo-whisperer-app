@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { trackTikTokEvent } from "@/lib/tiktokPixel";
+import { FreeShippingBanner } from "@/components/FreeShippingBanner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -433,6 +434,7 @@ const Checkout = () => {
   // ─── Main Checkout ───
   return (
     <div className="min-h-[100dvh] bg-background pb-[140px]">
+      <FreeShippingBanner />
       {/* Header */}
       <div className="sticky top-0 z-50 bg-card">
         <div className="flex items-center h-11 px-3 relative">
