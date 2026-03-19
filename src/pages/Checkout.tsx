@@ -165,7 +165,7 @@ const Checkout = () => {
       if (leadIdRef.current) {
         await supabase.from("checkout_leads").update(payload).eq("id", leadIdRef.current);
       } else {
-        const { data } = await supabase.from("checkout_leads").insert(payload).select("id").single();
+        const { data } = await supabase.from("checkout_leads").insert([payload as any]).select("id").single();
         if (data) leadIdRef.current = data.id;
       }
     } catch {}
