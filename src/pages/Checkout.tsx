@@ -399,22 +399,20 @@ const Checkout = () => {
             <X className="w-4 h-4 text-foreground" />
           </button>
         </div>
+        {/* Auto-detected location */}
+        {(addressData.city || addressData.state) && (
+          <div className="mx-4 mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/20">
+            <MapPin className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-[12px] text-foreground">
+              Frete grátis para: <strong>{addressData.city}{addressData.state ? `, ${addressData.state}` : ""}</strong>
+            </span>
+          </div>
+        )}
         <div className="px-4 pb-6 space-y-3">
           <input className={inputClass} placeholder="Nome completo" value={addressData.fullName} onChange={(e) => setAddressData((p) => ({ ...p, fullName: e.target.value }))} />
-          <input className={inputClass} placeholder="E-mail" type="email" value={addressData.email} onChange={(e) => setAddressData((p) => ({ ...p, email: e.target.value }))} />
-          <div className="relative">
-            <input className={inputClass} placeholder="CEP" value={addressData.cep}
-              onChange={(e) => { const formatted = formatCep(e.target.value); setAddressData((p) => ({ ...p, cep: formatted })); if (formatted.replace(/\D/g, "").length === 8) fetchCepData(formatted); }}
-            />
-            {cepLoading && <Loader2 className="absolute right-3 top-3 w-4 h-4 animate-spin text-muted-foreground" />}
-          </div>
-          <input className={inputClass} placeholder="Endereço completo" value={addressData.address} onChange={(e) => setAddressData((p) => ({ ...p, address: e.target.value }))} />
-          <div className="grid grid-cols-2 gap-3">
-            <input className={inputClass} placeholder="Cidade" value={addressData.city} onChange={(e) => setAddressData((p) => ({ ...p, city: e.target.value }))} />
-            <input className={inputClass} placeholder="Estado" value={addressData.state} onChange={(e) => setAddressData((p) => ({ ...p, state: e.target.value }))} />
-          </div>
-          <input className={inputClass} placeholder="WhatsApp (11) 99999-9999" value={addressData.whatsapp} onChange={(e) => setAddressData((p) => ({ ...p, whatsapp: formatWhatsapp(e.target.value) }))} />
-          <button onClick={handleSaveAddress} disabled={!addressData.fullName || !addressData.cep || !addressData.address || !addressData.whatsapp}
+          <input className={inputClass} placeholder="Telefone (11) 99999-9999" value={addressData.phone} onChange={(e) => setAddressData((p) => ({ ...p, phone: formatWhatsapp(e.target.value) }))} />
+          <input className={inputClass} placeholder="Número da rua" value={addressData.streetNumber} onChange={(e) => setAddressData((p) => ({ ...p, streetNumber: e.target.value }))} />
+          <button onClick={handleSaveAddress} disabled={!addressData.fullName || !addressData.phone || !addressData.streetNumber}
             className="w-full tiktok-btn-primary h-12 rounded-full text-[14px] font-bold disabled:opacity-50 mt-1">
             Salvar endereço
           </button>
