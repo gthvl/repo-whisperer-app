@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { trackTikTokEvent } from "@/lib/tiktokPixel";
+import { FreeShippingBanner } from "@/components/FreeShippingBanner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import {
