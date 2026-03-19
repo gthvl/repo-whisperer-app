@@ -401,7 +401,7 @@ const Checkout = () => {
         <div className="px-4 pb-5 space-y-3">
           <input className={inputClass} placeholder="Nome completo" value={addressData.fullName} onChange={(e) => setAddressData((p) => ({ ...p, fullName: e.target.value }))} />
           <input className={inputClass} placeholder="Telefone (11) 99999-9999" value={addressData.phone} onChange={(e) => setAddressData((p) => ({ ...p, phone: formatWhatsapp(e.target.value) }))} />
-          <input className={inputClass} placeholder="Número da rua" value={addressData.streetNumber} onChange={(e) => setAddressData((p) => ({ ...p, streetNumber: e.target.value }))} />
+          <input className={inputClass} placeholder="Rua e Número da Casa" value={addressData.streetNumber} onChange={(e) => setAddressData((p) => ({ ...p, streetNumber: e.target.value }))} />
           <button onClick={handleSaveAddress} disabled={!addressData.fullName || !addressData.phone || !addressData.streetNumber}
             className="w-full tiktok-btn-primary h-12 rounded-full text-[14px] font-bold disabled:opacity-50 mt-1">
             Salvar endereço
