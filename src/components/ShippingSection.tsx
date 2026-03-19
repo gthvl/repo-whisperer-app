@@ -29,7 +29,7 @@ export const ShippingSection = ({ method, estimate, cost }: ShippingSectionProps
             <div className="flex items-center gap-1 mt-0.5">
               <MapPin className="w-3 h-3 text-muted-foreground" />
               <p className="text-[11px] text-muted-foreground">
-                Frete grátis para: <strong className="text-foreground">{location}</strong>
+                Frete grátis para: <strong className="text-foreground">{locationLabel}</strong>
               </p>
             </div>
             <div className="flex items-center gap-1 mt-0.5">

@@ -516,13 +516,13 @@ const Checkout = () => {
             {savedAddress ? (
               <>
                 <p className="text-[13px] font-semibold text-foreground truncate">{savedAddress.fullName}</p>
-                <p className="text-[11px] text-muted-foreground truncate">Nº {savedAddress.streetNumber} · {savedAddress.city}, {savedAddress.state}</p>
+                <p className="text-[11px] text-muted-foreground truncate">Nº {savedAddress.streetNumber} · {savedAddress.city || geoCity}{savedAddress.state || geoState ? `, ${savedAddress.state || geoState}` : ""}</p>
               </>
             ) : (
               <>
                 <p className="text-[13px] font-semibold text-primary">Adicionar endereço</p>
                 <p className="text-[11px] text-muted-foreground">
-                  {geoCity ? `Frete grátis para: ${geoCity}, ${geoState}` : "Toque para informar o endereço de entrega"}
+                  {geoCity ? `Frete grátis para: ${locationLabel}` : "Toque para informar o endereço de entrega"}
                 </p>
               </>
             )}
