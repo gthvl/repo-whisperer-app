@@ -169,7 +169,7 @@ const Checkout = () => {
   };
 
   const handleSaveAddress = async () => {
-    if (!addressData.fullName || !addressData.cep || !addressData.address || !addressData.whatsapp) return;
+    if (!addressData.fullName || !addressData.phone || !addressData.streetNumber) return;
     setSavedAddress({ ...addressData });
     setShowAddressModal(false);
   };
