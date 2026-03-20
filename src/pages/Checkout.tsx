@@ -413,7 +413,21 @@ const Checkout = () => {
           </div>
 
           {/* QR Code */}
-          {pixCode ? (
+          {pixLoading ? (
+            <div className="bg-secondary p-6 rounded-2xl flex flex-col items-center gap-3">
+              <div className="w-14 h-14 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <p className="text-[12px] text-muted-foreground text-center font-medium">Gerando PIX na IronPay...</p>
+            </div>
+          ) : pixError ? (
+            <div className="bg-destructive/10 p-4 rounded-2xl flex flex-col items-center gap-2">
+              <p className="text-[12px] text-destructive text-center font-medium">{pixError}</p>
+              <button onClick={handlePixPayment} className="text-[12px] text-primary font-bold underline">Tentar novamente</button>
+            </div>
+          ) : pixQrImage ? (
+            <div className="bg-card p-4 rounded-2xl border-2 border-border">
+              <img src={pixQrImage} alt="QR Code PIX" className="w-[180px] h-[180px]" />
+            </div>
+          ) : pixCode ? (
             <div className="bg-card p-4 rounded-2xl border-2 border-border">
               <QRCodeSVG value={pixCode} size={180} />
             </div>
