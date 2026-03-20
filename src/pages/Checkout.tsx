@@ -497,31 +497,79 @@ const Checkout = () => {
 
   // ─── Address Modal ───
   const addressModal = showAddressModal && (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-sm" onClick={() => setShowAddressModal(false)} />
-      <div className="relative bg-card w-full max-w-[400px] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <span className="text-[15px] font-bold text-foreground">Endereço de entrega</span>
+      <div className="relative bg-card w-full sm:max-w-[420px] overflow-y-auto rounded-t-[20px] sm:rounded-2xl border-t sm:border border-border shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
+        {/* Drag handle (mobile) */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-3 sm:pt-5 pb-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+              <MapPin className="w-[18px] h-[18px] text-primary" />
+            </div>
+            <div>
+              <span className="text-[15px] font-bold text-foreground block leading-tight">Confirme seu endereço</span>
+              <span className="text-[11px] text-muted-foreground">Para calcular entrega e prazo</span>
+            </div>
+          </div>
           <button onClick={() => setShowAddressModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-secondary">
             <X className="w-4 h-4 text-foreground" />
           </button>
         </div>
+
+        {/* Detected location card */}
         {(addressData.city || addressData.state) && (
-          <div className="mx-4 mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/20">
-            <MapPin className="w-4 h-4 text-primary shrink-0" />
-            <span className="text-[12px] text-foreground">
-              Frete grátis para: <strong>{addressData.city}{addressData.state ? `, ${addressData.state}` : ""}</strong>
-            </span>
+          <div className="mx-5 mt-2 mb-4 rounded-xl overflow-hidden border border-border">
+            <div className="flex items-center gap-2 px-3.5 py-2 bg-[hsl(var(--tiktok-green))]/8 border-b border-border">
+              <Check className="w-3.5 h-3.5 shrink-0" style={{ color: 'hsl(var(--tiktok-green))' }} />
+              <span className="text-[11px] font-semibold" style={{ color: 'hsl(var(--tiktok-green))' }}>Localização detectada automaticamente</span>
+            </div>
+            <div className="px-3.5 py-3 bg-secondary/40 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <MapPin className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold text-foreground leading-tight">
+                  {addressData.city}{addressData.state ? `, ${addressData.state}` : ""}
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Brasil</p>
+              </div>
+              <div className="ml-auto flex items-center gap-1 px-2 py-1 rounded-full bg-[hsl(var(--tiktok-green))]/10">
+                <Truck className="w-3 h-3" style={{ color: 'hsl(var(--tiktok-green))' }} />
+                <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--tiktok-green))' }}>Frete Grátis</span>
+              </div>
+            </div>
           </div>
         )}
-        <div className="px-4 pb-5 space-y-3">
-          <input className={inputClass} placeholder="Rua e Número da Casa" value={addressData.streetNumber} onChange={(e) => setAddressData((p) => ({ ...p, streetNumber: e.target.value }))} />
-          <input className={inputClass} placeholder="Telefone (11) 99999-9999" value={addressData.phone} onChange={(e) => setAddressData((p) => ({ ...p, phone: formatWhatsapp(e.target.value) }))} />
-          <input className={inputClass} placeholder="Nome do destinatário" value={addressData.fullName} onChange={(e) => setAddressData((p) => ({ ...p, fullName: e.target.value }))} />
+
+        {/* Form fields */}
+        <div className="px-5 pb-6 space-y-3">
+          <div>
+            <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Endereço</label>
+            <input className={inputClass} placeholder="Rua e Número da Casa" value={addressData.streetNumber} onChange={(e) => setAddressData((p) => ({ ...p, streetNumber: e.target.value }))} />
+          </div>
+          <div>
+            <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Telefone</label>
+            <input className={inputClass} placeholder="(11) 99999-9999" value={addressData.phone} onChange={(e) => setAddressData((p) => ({ ...p, phone: formatWhatsapp(e.target.value) }))} />
+          </div>
+          <div>
+            <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Destinatário</label>
+            <input className={inputClass} placeholder="Nome completo do destinatário" value={addressData.fullName} onChange={(e) => setAddressData((p) => ({ ...p, fullName: e.target.value }))} />
+          </div>
+
           <button onClick={handleSaveAddress} disabled={!addressData.fullName || !addressData.phone || !addressData.streetNumber}
-            className="w-full tiktok-btn-primary h-12 rounded-full text-[14px] font-bold disabled:opacity-50 mt-1">
-            Salvar endereço
+            className="w-full tiktok-btn-primary h-12 rounded-full text-[14px] font-bold disabled:opacity-50 mt-2">
+            Confirmar endereço
           </button>
+
+          <div className="flex items-center justify-center gap-1.5 pt-1">
+            <Lock className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[10px] text-muted-foreground">Seus dados estão protegidos e seguros</span>
+          </div>
         </div>
       </div>
     </div>
