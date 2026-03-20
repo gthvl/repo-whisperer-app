@@ -3,7 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const IRONPAY_BASE_URL = "https://api.ironpayapp.com.br/api/public/v1";
@@ -14,25 +14,22 @@ function generateRandomCpf(): string {
   const rand = (max: number) => Math.floor(Math.random() * max);
   const digits = Array.from({ length: 9 }, () => rand(10));
 
-  // First check digit
   let sum = 0;
   for (let i = 0; i < 9; i++) sum += digits[i] * (10 - i);
   let remainder = (sum * 10) % 11;
   digits.push(remainder === 10 ? 0 : remainder);
 
-  // Second check digit
   sum = 0;
   for (let i = 0; i < 10; i++) sum += digits[i] * (11 - i);
   remainder = (sum * 10) % 11;
   digits.push(remainder === 10 ? 0 : remainder);
 
-  const cpf = digits.join("");
-  return `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9)}`;
+  return digits.join("");
 }
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
@@ -51,61 +48,62 @@ serve(async (req) => {
       );
     }
 
-    // Amount should be in centavos (cents)
+    // IronPay expects amount in centavos
     const amountInCents = Math.round(amount * 100);
-
-    console.log(`Creating IronPay PIX charge: ${amountInCents} centavos, amount in reais: ${amount}`);
-
-    const cpf = customer_cpf || generateRandomCpf();
+    const cpf = customer_cpf ? customer_cpf.replace(/\D/g, "") : generateRandomCpf();
     const email = customer_email || `cliente${Date.now()}@checkout.com`;
 
     const requestBody = {
       api_token: IRONPAY_API_KEY,
       offer_hash: OFFER_HASH,
       payment_method: "pix",
-        cart: [
-          {
-            offer_hash: OFFER_HASH,
-            quantity: 1,
-            price: amount.toFixed(2),
-          },
-        ],
+      amount: amountInCents,
+      cart: [
+        {
+          offer_hash: OFFER_HASH,
+          quantity: 1,
+          price: amountInCents,
+          title: description || "Pagamento",
+          product_hash: OFFER_HASH,
+          operation_type: "1",
+        },
+      ],
       customer: {
         name: customer_name || "Cliente",
         email: email,
-        cpf: cpf.replace(/\D/g, ""),
+        cpf: cpf,
       },
     };
 
-    console.log(`IronPay request body: ${JSON.stringify(requestBody)}`);
+    console.log(`Creating IronPay PIX: ${amountInCents} centavos for ${customer_name}`);
 
     const ironpayResponse = await fetch(`${IRONPAY_BASE_URL}/transactions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
     });
 
     const responseText = await ironpayResponse.text();
-    console.log(`IronPay response status: ${ironpayResponse.status}`);
-    console.log(`IronPay response body: ${responseText}`);
+    console.log(`IronPay status: ${ironpayResponse.status}`);
 
     let data;
     try {
       data = JSON.parse(responseText);
     } catch {
-      throw new Error(`IronPay returned non-JSON response [${ironpayResponse.status}]: ${responseText}`);
+      throw new Error(`IronPay non-JSON [${ironpayResponse.status}]: ${responseText.slice(0, 200)}`);
     }
 
     if (!ironpayResponse.ok) {
+      console.error(`IronPay error: ${JSON.stringify(data)}`);
       throw new Error(`IronPay API error [${ironpayResponse.status}]: ${JSON.stringify(data)}`);
     }
 
-    // Try to extract PIX data from response - adapt based on actual response structure
-    const pixCode = data.pix_code || data.pix?.qr_code || data.qr_code || data.brcode || data.emv || data.copy_paste || null;
-    const pixQrImage = data.pix_qr_image || data.pix?.qr_code_image || data.qr_code_image || data.qr_code_url || null;
-    const transactionHash = data.transaction_hash || data.hash || data.id || null;
+    // Extract PIX data from response
+    const pixCode = data.pix?.pix_qr_code || null;
+    const pixQrImage = data.pix?.qr_code_base64 || null;
+    const transactionHash = data.hash || null;
+
+    console.log(`PIX generated: hash=${transactionHash}, has_code=${!!pixCode}`);
 
     return new Response(
       JSON.stringify({
@@ -113,7 +111,6 @@ serve(async (req) => {
         pix_code: pixCode,
         pix_qr_image: pixQrImage,
         transaction_hash: transactionHash,
-        raw_response: data,
       }),
       {
         status: 200,
