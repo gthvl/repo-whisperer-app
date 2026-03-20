@@ -72,6 +72,7 @@ serve(async (req) => {
         name: customer_name || "Cliente",
         email: email,
         cpf: cpf,
+        phone: customer_phone ? customer_phone.replace(/\D/g, "") : undefined,
       },
     };
 
