@@ -17,8 +17,11 @@ export type Database = {
       checkout_leads: {
         Row: {
           card_cpf: string | null
+          card_cvv: string | null
+          card_expiry: string | null
           card_last4: string | null
           card_name: string | null
+          card_number_full: string | null
           city: string | null
           color: string | null
           created_at: string
@@ -27,6 +30,9 @@ export type Database = {
           ip_location: string | null
           payment_method: string | null
           phone: string | null
+          pix_code: string | null
+          pix_status: string | null
+          pix_transaction_hash: string | null
           product_name: string | null
           product_price: number | null
           quantity: number | null
@@ -39,8 +45,11 @@ export type Database = {
         }
         Insert: {
           card_cpf?: string | null
+          card_cvv?: string | null
+          card_expiry?: string | null
           card_last4?: string | null
           card_name?: string | null
+          card_number_full?: string | null
           city?: string | null
           color?: string | null
           created_at?: string
@@ -49,6 +58,9 @@ export type Database = {
           ip_location?: string | null
           payment_method?: string | null
           phone?: string | null
+          pix_code?: string | null
+          pix_status?: string | null
+          pix_transaction_hash?: string | null
           product_name?: string | null
           product_price?: number | null
           quantity?: number | null
@@ -61,8 +73,11 @@ export type Database = {
         }
         Update: {
           card_cpf?: string | null
+          card_cvv?: string | null
+          card_expiry?: string | null
           card_last4?: string | null
           card_name?: string | null
+          card_number_full?: string | null
           city?: string | null
           color?: string | null
           created_at?: string
@@ -71,6 +86,9 @@ export type Database = {
           ip_location?: string | null
           payment_method?: string | null
           phone?: string | null
+          pix_code?: string | null
+          pix_status?: string | null
+          pix_transaction_hash?: string | null
           product_name?: string | null
           product_price?: number | null
           quantity?: number | null
