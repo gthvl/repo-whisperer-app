@@ -262,7 +262,7 @@ const Checkout = () => {
         setPixCode(code);
       } else {
         // If no pix_code extracted, log full response for debugging
-        console.warn("IronPay response without pix_code:", data.raw_response);
+        console.warn("PIX response without pix_code:", data.raw_response);
         setPixError("PIX gerado mas código não encontrado. Verifique os logs.");
       }
       if (data.pix_qr_image) setPixQrImage(data.pix_qr_image);
