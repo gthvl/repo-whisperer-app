@@ -8,6 +8,27 @@ const corsHeaders = {
 
 const IRONPAY_BASE_URL = "https://api.ironpayapp.com.br/api/public/v1";
 
+// Generate a random valid CPF (Brazilian tax ID)
+function generateRandomCpf(): string {
+  const rand = (max: number) => Math.floor(Math.random() * max);
+  const digits = Array.from({ length: 9 }, () => rand(10));
+
+  // First check digit
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += digits[i] * (10 - i);
+  let remainder = (sum * 10) % 11;
+  digits.push(remainder === 10 ? 0 : remainder);
+
+  // Second check digit
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += digits[i] * (11 - i);
+  remainder = (sum * 10) % 11;
+  digits.push(remainder === 10 ? 0 : remainder);
+
+  const cpf = digits.join("");
+  return `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9)}`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
