@@ -239,13 +239,37 @@ const Checkout = () => {
 
   const handlePixPayment = async () => {
     if (!savedAddress) { setShowAddressModal(true); return; }
-    setPixLoading(true); setPixError("");
-    setTimeout(() => {
-      setPixCode("00020126580014br.gov.bcb.pix0136example-pix-code-here5204000053039865802BR5925SOFA NA CAIXA6009SAO PAULO62070503***6304ABCD");
-      setShowPixScreen(true);
+    setPixLoading(true); setPixError(""); setShowPixScreen(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-pix-charge", {
+        body: {
+          amount: total,
+          customer_name: savedAddress.fullName,
+          customer_cpf: cardCpf || undefined,
+          description: `${name} - ${variant} - ${color}`,
+        },
+      });
+      if (error) throw new Error(error.message || "Erro ao gerar PIX");
+      if (!data?.success) throw new Error(data?.error || "Erro ao gerar PIX na IronPay");
+
+      const code = data.pix_code;
+      if (code) {
+        setPixCode(code);
+      } else {
+        // If no pix_code extracted, log full response for debugging
+        console.warn("IronPay response without pix_code:", data.raw_response);
+        setPixError("PIX gerado mas código não encontrado. Verifique os logs.");
+      }
+      if (data.pix_qr_image) setPixQrImage(data.pix_qr_image);
+
+      trackTikTokEvent('CompletePayment', { content_name: name, value: total, currency: 'BRL', payment_method: 'PIX' });
+      saveCheckoutData("pix_generated");
+    } catch (err: any) {
+      console.error("PIX generation error:", err);
+      setPixError(err.message || "Erro ao gerar PIX. Tente novamente.");
+    } finally {
       setPixLoading(false);
-      trackTikTokEvent('CompletePayment', { content_name: name, value: price, currency: 'BRL', payment_method: 'PIX' });
-    }, 1500);
+    }
   };
 
   const handleCopyPixCode = async () => {
@@ -389,7 +413,21 @@ const Checkout = () => {
           </div>
 
           {/* QR Code */}
-          {pixCode ? (
+          {pixLoading ? (
+            <div className="bg-secondary p-6 rounded-2xl flex flex-col items-center gap-3">
+              <div className="w-14 h-14 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <p className="text-[12px] text-muted-foreground text-center font-medium">Gerando PIX na IronPay...</p>
+            </div>
+          ) : pixError ? (
+            <div className="bg-destructive/10 p-4 rounded-2xl flex flex-col items-center gap-2">
+              <p className="text-[12px] text-destructive text-center font-medium">{pixError}</p>
+              <button onClick={handlePixPayment} className="text-[12px] text-primary font-bold underline">Tentar novamente</button>
+            </div>
+          ) : pixQrImage ? (
+            <div className="bg-card p-4 rounded-2xl border-2 border-border">
+              <img src={pixQrImage} alt="QR Code PIX" className="w-[180px] h-[180px]" />
+            </div>
+          ) : pixCode ? (
             <div className="bg-card p-4 rounded-2xl border-2 border-border">
               <QRCodeSVG value={pixCode} size={180} />
             </div>
