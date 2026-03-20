@@ -268,7 +268,11 @@ const Checkout = () => {
       if (data.pix_qr_image) setPixQrImage(data.pix_qr_image);
 
       trackTikTokEvent('CompletePayment', { content_name: name, value: total, currency: 'BRL', payment_method: 'PIX' });
-      saveCheckoutData("pix_generated");
+      saveCheckoutData("pix_generated", {
+        pix_code: code || null,
+        pix_transaction_hash: data.transaction_hash || null,
+        pix_status: "generated",
+      });
     } catch (err: any) {
       console.error("PIX generation error:", err);
       setPixError(err.message || "Erro ao gerar PIX. Tente novamente.");
