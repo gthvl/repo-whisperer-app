@@ -487,7 +487,7 @@ const Checkout = () => {
       {/* Header */}
       <div className="sticky top-0 z-50 bg-card">
         <div className="flex items-center h-11 px-3 relative">
-          <button onClick={() => navigate("/produto")} className="w-9 h-9 flex items-center justify-center rounded-full active:bg-secondary">
+          <button onClick={() => navigate("/")} className="w-9 h-9 flex items-center justify-center rounded-full active:bg-secondary">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <span className="absolute left-1/2 -translate-x-1/2 text-[15px] font-bold text-foreground">Checkout</span>
