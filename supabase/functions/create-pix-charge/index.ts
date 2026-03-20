@@ -39,7 +39,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { amount, customer_name, customer_email, customer_cpf, description } = body;
+    const { amount, customer_name, customer_email, customer_phone, customer_cpf, description } = body;
 
     if (!amount || amount <= 0) {
       return new Response(
@@ -72,6 +72,7 @@ serve(async (req) => {
         name: customer_name || "Cliente",
         email: email,
         cpf: cpf,
+        phone: customer_phone ? customer_phone.replace(/\D/g, "") : undefined,
       },
     };
 

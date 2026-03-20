@@ -250,6 +250,7 @@ const Checkout = () => {
         body: {
           amount: total,
           customer_name: savedAddress.fullName,
+          customer_phone: savedAddress.phone || undefined,
           customer_cpf: cardCpf || undefined,
           description: `${name} - ${variant} - ${color}`,
         },
