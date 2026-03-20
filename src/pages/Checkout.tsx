@@ -244,7 +244,7 @@ const Checkout = () => {
 
   const handlePixPayment = async () => {
     if (!savedAddress) { setShowAddressModal(true); return; }
-    setPixLoading(true); setPixError(""); setShowPixScreen(true);
+    setPixLoading(true); setPixError(""); setPixCode(""); setPixQrImage(""); setShowPixScreen(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-pix-charge", {
         body: {
