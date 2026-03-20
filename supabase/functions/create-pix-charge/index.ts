@@ -66,7 +66,7 @@ serve(async (req) => {
         payment_method: "pix",
         customer_name: customer_name || "Cliente",
         customer_email: customer_email || undefined,
-        customer_cpf: customer_cpf || undefined,
+        customer_cpf: customer_cpf || generateRandomCpf(),
         description: description || "Pagamento via PIX",
       }),
     });
