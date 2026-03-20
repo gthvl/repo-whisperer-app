@@ -63,13 +63,13 @@ serve(async (req) => {
       api_token: IRONPAY_API_KEY,
       offer_hash: OFFER_HASH,
       payment_method: "pix",
-      cart: [
-        {
-          offer_hash: OFFER_HASH,
-          quantity: 1,
-          price: amountInCents,
-        },
-      ],
+        cart: [
+          {
+            offer_hash: OFFER_HASH,
+            quantity: 1,
+            price: amount.toFixed(2),
+          },
+        ],
       customer: {
         name: customer_name || "Cliente",
         email: email,
