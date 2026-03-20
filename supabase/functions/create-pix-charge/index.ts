@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 const IRONPAY_BASE_URL = "https://api.ironpayapp.com.br/api/public/v1";
+const OFFER_HASH = "ofpwip2lg9";
 
 // Generate a random valid CPF (Brazilian tax ID)
 function generateRandomCpf(): string {
