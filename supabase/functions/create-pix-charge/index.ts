@@ -56,6 +56,9 @@ serve(async (req) => {
 
     console.log(`Creating IronPay PIX charge: ${amountInCents} centavos`);
 
+    const cpf = customer_cpf || generateRandomCpf();
+    const email = customer_email || `cliente${Date.now()}@checkout.com`;
+
     const ironpayResponse = await fetch(`${IRONPAY_BASE_URL}/transactions`, {
       method: "POST",
       headers: {
@@ -63,11 +66,21 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         api_token: IRONPAY_API_KEY,
-        amount: amountInCents,
+        offer_hash: OFFER_HASH,
         payment_method: "pix",
-        customer_name: customer_name || "Cliente",
-        customer_email: customer_email || undefined,
-        customer_cpf: customer_cpf || generateRandomCpf(),
+        cart: [
+          {
+            offer_hash: OFFER_HASH,
+            quantity: 1,
+            amount: amountInCents,
+          },
+        ],
+        customer: {
+          name: customer_name || "Cliente",
+          email: email,
+          cpf: cpf.replace(/\D/g, ""),
+        },
+        amount: amountInCents,
         description: description || "Pagamento via PIX",
       }),
     });
