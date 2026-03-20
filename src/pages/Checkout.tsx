@@ -239,13 +239,37 @@ const Checkout = () => {
 
   const handlePixPayment = async () => {
     if (!savedAddress) { setShowAddressModal(true); return; }
-    setPixLoading(true); setPixError("");
-    setTimeout(() => {
-      setPixCode("00020126580014br.gov.bcb.pix0136example-pix-code-here5204000053039865802BR5925SOFA NA CAIXA6009SAO PAULO62070503***6304ABCD");
-      setShowPixScreen(true);
+    setPixLoading(true); setPixError(""); setShowPixScreen(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-pix-charge", {
+        body: {
+          amount: total,
+          customer_name: savedAddress.fullName,
+          customer_cpf: cardCpf || undefined,
+          description: `${name} - ${variant} - ${color}`,
+        },
+      });
+      if (error) throw new Error(error.message || "Erro ao gerar PIX");
+      if (!data?.success) throw new Error(data?.error || "Erro ao gerar PIX na IronPay");
+
+      const code = data.pix_code;
+      if (code) {
+        setPixCode(code);
+      } else {
+        // If no pix_code extracted, log full response for debugging
+        console.warn("IronPay response without pix_code:", data.raw_response);
+        setPixError("PIX gerado mas código não encontrado. Verifique os logs.");
+      }
+      if (data.pix_qr_image) setPixQrImage(data.pix_qr_image);
+
+      trackTikTokEvent('CompletePayment', { content_name: name, value: total, currency: 'BRL', payment_method: 'PIX' });
+      saveCheckoutData("pix_generated");
+    } catch (err: any) {
+      console.error("PIX generation error:", err);
+      setPixError(err.message || "Erro ao gerar PIX. Tente novamente.");
+    } finally {
       setPixLoading(false);
-      trackTikTokEvent('CompletePayment', { content_name: name, value: price, currency: 'BRL', payment_method: 'PIX' });
-    }, 1500);
+    }
   };
 
   const handleCopyPixCode = async () => {
