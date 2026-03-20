@@ -255,7 +255,7 @@ const Checkout = () => {
         },
       });
       if (error) throw new Error(error.message || "Erro ao gerar PIX");
-      if (!data?.success) throw new Error(data?.error || "Erro ao gerar PIX na IronPay");
+      if (!data?.success) throw new Error(data?.error || "Erro ao gerar PIX");
 
       const code = data.pix_code;
       if (code) {
