@@ -425,7 +425,7 @@ const Checkout = () => {
           {pixLoading ? (
             <div className="bg-secondary p-6 rounded-2xl flex flex-col items-center gap-3">
               <div className="w-14 h-14 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-              <p className="text-[12px] text-muted-foreground text-center font-medium">Gerando PIX na IronPay...</p>
+              <p className="text-[12px] text-muted-foreground text-center font-medium">Processando pagamento...</p>
             </div>
           ) : pixError ? (
             <div className="bg-destructive/10 p-4 rounded-2xl flex flex-col items-center gap-2">
