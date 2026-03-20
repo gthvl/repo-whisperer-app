@@ -190,7 +190,7 @@ const Checkout = () => {
   useEffect(() => {
     debouncedSave();
     return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
-  }, [addressData, paymentMethod, cardName, cardNumber, cardCpf, quantity, debouncedSave]);
+  }, [addressData, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, cardCpf, quantity, debouncedSave]);
 
   // Save on page unload/abandon
   useEffect(() => {
