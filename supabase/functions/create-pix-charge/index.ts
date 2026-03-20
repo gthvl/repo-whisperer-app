@@ -72,6 +72,7 @@ serve(async (req) => {
           {
             offer_hash: OFFER_HASH,
             quantity: 1,
+            price: amountInCents,
             amount: amountInCents,
           },
         ],
