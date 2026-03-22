@@ -101,9 +101,6 @@ export const productData: ProductData = {
       rating: 3,
       date: "02/05/2025",
       text: "Superou minhas expectativas pelo preço. Chegou dentro do prazo previsto.",
-      images: [
-        "/images/review-photo-2a.png",
-      ],
     },
     {
       id: 3,
