@@ -638,152 +638,150 @@ const Checkout = () => {
     </div>
   );
 
-  // ─── Main Checkout ───
+  // ─── Main Checkout (TikTok Shop style) ───
   return (
-    <div className="min-h-[100dvh] bg-background pb-[160px]">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-card">
-        <div className="flex items-center h-12 px-3 relative">
-          <button onClick={() => navigate("/")} className="w-10 h-10 flex items-center justify-center rounded-full active:bg-secondary">
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div className="min-h-[100dvh] bg-secondary pb-[130px]">
+      {/* TikTok Shop Header */}
+      <div className="sticky top-0 z-50 bg-card border-b border-border">
+        <div className="flex items-center h-11 px-2 relative">
+          <button onClick={() => navigate("/")} className="w-10 h-10 flex items-center justify-center active:opacity-60">
+            <ArrowLeft className="w-[18px] h-[18px] text-foreground" />
           </button>
-          <span className="absolute left-1/2 -translate-x-1/2 text-[15px] font-bold text-foreground">Checkout Seguro</span>
-          <div className="ml-auto flex items-center gap-1 bg-[hsl(var(--tiktok-green))]/10 px-2 py-1 rounded-full">
-            <Lock className="w-3 h-3" style={{ color: 'hsl(var(--tiktok-green))' }} />
-            <span className="text-[10px] font-semibold" style={{ color: 'hsl(var(--tiktok-green))' }}>SSL</span>
-          </div>
-        </div>
-        {/* Countdown bar */}
-        <div className="flex items-center justify-center gap-1.5 py-2"
-          style={{ background: "linear-gradient(90deg, hsl(var(--tiktok-red)) 0%, hsl(var(--tiktok-orange)) 100%)" }}>
-          <Zap className="w-3.5 h-3.5 fill-primary-foreground text-primary-foreground" />
-          <span className="text-primary-foreground text-[12px] font-bold tabular-nums">
-            Oferta expira em {countdownDisplay}
-          </span>
+          <span className="absolute left-1/2 -translate-x-1/2 text-[15px] font-semibold text-foreground">Confirmar pedido</span>
         </div>
       </div>
 
-      {/* Stock urgency alert */}
-      <div className="mx-3 mt-3 mb-2 flex items-center gap-2.5 bg-[hsl(var(--tiktok-orange))]/10 border border-[hsl(var(--tiktok-orange))]/20 rounded-xl px-3.5 py-2.5">
-        <div className="w-2 h-2 rounded-full bg-[hsl(var(--tiktok-orange))] animate-pulse shrink-0" />
-        <span className="text-[12px] font-bold" style={{ color: 'hsl(var(--tiktok-orange))' }}>
-          ⚠️ Apenas 4 unidades restantes em estoque!
+      {/* Promo banner - TikTok style thin bar */}
+      <div className="flex items-center justify-center gap-1.5 py-1.5 bg-[hsl(var(--tiktok-red-light))]">
+        <Zap className="w-3 h-3 text-primary fill-primary" />
+        <span className="text-[11px] font-semibold text-primary tabular-nums">
+          Oferta por tempo limitado · {countdownDisplay}
         </span>
+        <span className="text-[11px] text-primary">|</span>
+        <span className="text-[11px] font-semibold text-primary">4 restantes</span>
       </div>
 
-      {/* Address */}
-      <button onClick={() => setShowAddressModal(true)} className="w-full bg-card mb-1.5 active:bg-secondary/50 transition-colors">
-        <div className="flex items-center gap-3 px-4 py-3.5">
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <MapPin className="w-[18px] h-[18px] text-primary" />
-          </div>
+      {/* Address section - TikTok style */}
+      <button onClick={() => setShowAddressModal(true)} className="w-full bg-card mb-[6px] active:bg-secondary/30 transition-colors">
+        <div className="flex items-start gap-2.5 px-4 py-3">
+          <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
           <div className="flex-1 text-left min-w-0">
             {savedAddress ? (
               <>
-                <p className="text-[13px] font-semibold text-foreground truncate">{savedAddress.fullName}</p>
-                <p className="text-[11px] text-muted-foreground truncate">Nº {savedAddress.streetNumber} · {savedAddress.city || geoCity}{savedAddress.state || geoState ? `, ${savedAddress.state || geoState}` : ""}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[13px] font-medium text-foreground">{savedAddress.fullName}</p>
+                  <p className="text-[12px] text-muted-foreground">{savedAddress.phone}</p>
+                </div>
+                <p className="text-[12px] text-muted-foreground mt-0.5 truncate">
+                  Nº {savedAddress.streetNumber}, {savedAddress.city || geoCity}{savedAddress.state || geoState ? ` - ${savedAddress.state || geoState}` : ""}
+                </p>
               </>
             ) : (
               <>
-                <p className="text-[13px] font-bold text-primary">+ Adicionar endereço de entrega</p>
-                <p className="text-[11px] text-muted-foreground">
-                  {geoCity ? `Frete grátis para: ${locationLabel}` : "Toque para informar o endereço"}
+                <p className="text-[13px] font-medium text-primary">Adicionar endereço</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {geoCity ? `${locationLabel} · Frete grátis disponível` : "Informe o endereço de entrega"}
                 </p>
               </>
             )}
           </div>
-          <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
         </div>
+        {/* Zigzag divider like TikTok */}
+        <div className="h-[3px] w-full" style={{ background: 'repeating-linear-gradient(90deg, hsl(var(--tiktok-red)) 0px, hsl(var(--tiktok-red)) 8px, hsl(var(--tiktok-cyan)) 8px, hsl(var(--tiktok-cyan)) 16px, hsl(var(--tiktok-orange)) 16px, hsl(var(--tiktok-orange)) 24px)' }} />
       </button>
 
-      {/* Product card */}
-      <div className="bg-card mb-1.5 px-4 py-3.5">
-        <div className="flex items-center gap-1.5 mb-3">
-          <Store className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-[11px] font-medium text-foreground">{seller}</span>
-          <div className="ml-auto flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3" style={{ color: 'hsl(var(--tiktok-green))' }} />
-            <span className="text-[10px] font-semibold" style={{ color: 'hsl(var(--tiktok-green))' }}>Loja Verificada</span>
-          </div>
+      {/* Product section */}
+      <div className="bg-card mb-[6px]">
+        {/* Seller row */}
+        <div className="flex items-center gap-1.5 px-4 pt-3 pb-2">
+          <Store className="w-3.5 h-3.5 text-foreground" />
+          <span className="text-[12px] font-medium text-foreground">{seller}</span>
+          <ChevronRight className="w-3 h-3 text-muted-foreground" />
         </div>
-        <div className="flex gap-3">
-          <div className="w-[76px] h-[76px] rounded-xl bg-secondary overflow-hidden shrink-0 border border-border">
+        <div className="h-px bg-border mx-4" />
+        {/* Product row */}
+        <div className="flex gap-3 px-4 py-3">
+          <div className="w-[72px] h-[72px] rounded-lg bg-secondary overflow-hidden shrink-0">
             {image ? <img src={image} alt={name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">Img</div>}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] text-foreground leading-tight line-clamp-2 font-medium">{name}</p>
-            <div className="flex items-center gap-1.5 mt-1">
+            <p className="text-[12px] text-foreground leading-snug line-clamp-2">{name}</p>
+            <div className="flex items-center gap-1 mt-1">
               {variant && <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{variant}</span>}
               {color && <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{color}</span>}
             </div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-[16px] font-extrabold tiktok-price">R$ {price.toFixed(2).replace(".", ",")}</span>
-                <span className="text-[10px] text-muted-foreground line-through">R$ {originalPrice.toFixed(2).replace(".", ",")}</span>
+            <div className="flex items-center justify-between mt-1.5">
+              <div className="flex items-baseline gap-1">
+                <span className="text-[14px] font-bold tiktok-price">R${price.toFixed(2).replace(".", ",")}</span>
+                <span className="text-[10px] text-muted-foreground line-through">R${originalPrice.toFixed(2).replace(".", ",")}</span>
               </div>
-              <span className="text-[9px] font-bold text-primary-foreground bg-primary px-1.5 py-0.5 rounded-full">-{discount}%</span>
+              <span className="text-[12px] text-muted-foreground">x{quantity}</span>
             </div>
           </div>
         </div>
-        {/* Quantity - large touch targets */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-          <span className="text-[12px] font-semibold text-foreground">Quantidade</span>
-          <div className="flex items-center gap-3">
+        {/* Quantity row */}
+        <div className="h-px bg-border mx-4" />
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <span className="text-[12px] text-foreground">Quantidade</span>
+          <div className="flex items-center gap-0">
             <button onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}
-              className="w-9 h-9 flex items-center justify-center rounded-full border border-border active:bg-secondary disabled:opacity-30 transition-all">
-              <Minus className="w-4 h-4 text-foreground" />
+              className="w-8 h-8 flex items-center justify-center border border-border rounded-l-md disabled:opacity-30 active:bg-secondary">
+              <Minus className="w-3.5 h-3.5 text-foreground" />
             </button>
-            <span className="text-[15px] font-bold text-foreground w-5 text-center tabular-nums">{quantity}</span>
+            <span className="w-10 h-8 flex items-center justify-center border-y border-border text-[13px] font-medium text-foreground tabular-nums bg-card">{quantity}</span>
             <button onClick={() => setQuantity(quantity + 1)}
-              className="w-9 h-9 flex items-center justify-center rounded-full border border-border active:bg-secondary transition-all">
-              <Plus className="w-4 h-4 text-foreground" />
+              className="w-8 h-8 flex items-center justify-center border border-border rounded-r-md active:bg-secondary">
+              <Plus className="w-3.5 h-3.5 text-foreground" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Shipping */}
-      <div className="bg-card mb-1.5 px-4 py-3.5">
-        <div className="flex items-center gap-2 mb-3">
-          <Truck className="w-4 h-4" style={{ color: 'hsl(var(--tiktok-green))' }} />
-          <span className="text-[12px] font-bold text-foreground">Entrega</span>
+      {/* Shipping section */}
+      <div className="bg-card mb-[6px] px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Truck className="w-4 h-4 text-muted-foreground" />
+            <span className="text-[12px] text-foreground">Envio</span>
+          </div>
+          <div className="flex items-center gap-1">
+            {shippingCost === 0 ? (
+              <>
+                <span className="text-[10px] text-muted-foreground line-through mr-1">R$17,50</span>
+                <span className="text-[12px] font-semibold" style={{ color: 'hsl(var(--tiktok-green))' }}>Grátis</span>
+              </>
+            ) : (
+              <span className="text-[12px] text-foreground">R$ {shippingCost.toFixed(2).replace(".", ",")}</span>
+            )}
+          </div>
         </div>
-        <div className="space-y-2">
+        <div className="flex items-center gap-1.5 mt-2">
+          <Package className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-[11px] text-muted-foreground">
+            Estimativa de entrega: {shippingMethod === "premium" ? "3-5" : "7-12"} dias úteis
+          </span>
+        </div>
+        {/* Shipping toggle */}
+        <div className="flex gap-2 mt-2.5">
           <button onClick={() => setShippingMethod("standard")}
-            className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all active:scale-[0.99] ${shippingMethod === "standard" ? "border-primary bg-primary/5" : "border-border"}`}>
-            <div className="flex items-center gap-2.5">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingMethod === "standard" ? "border-primary" : "border-muted-foreground/40"}`}>
-                {shippingMethod === "standard" && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-              </div>
-              <div className="text-left">
-                <span className="text-[12px] font-semibold text-foreground block">Padrão · 7-12 dias</span>
-                <span className="text-[10px] text-muted-foreground">Envio rastreado</span>
-              </div>
-            </div>
-            <span className="text-[12px] font-bold" style={{ color: 'hsl(var(--tiktok-green))' }}>Grátis</span>
+            className={`flex-1 py-2 rounded-md text-[11px] font-medium border transition-all ${shippingMethod === "standard" ? "border-primary text-primary bg-primary/5" : "border-border text-muted-foreground"}`}>
+            Padrão · Grátis
           </button>
           <button onClick={() => setShippingMethod("premium")}
-            className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all active:scale-[0.99] ${shippingMethod === "premium" ? "border-primary bg-primary/5" : "border-border"}`}>
-            <div className="flex items-center gap-2.5">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingMethod === "premium" ? "border-primary" : "border-muted-foreground/40"}`}>
-                {shippingMethod === "premium" && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-              </div>
-              <div className="text-left">
-                <span className="text-[12px] font-semibold text-foreground block">Expresso · 3-5 dias</span>
-                <span className="text-[10px] text-muted-foreground">Entrega prioritária</span>
-              </div>
-            </div>
-            <span className="text-[12px] font-semibold text-foreground">R$ 17,50</span>
+            className={`flex-1 py-2 rounded-md text-[11px] font-medium border transition-all ${shippingMethod === "premium" ? "border-primary text-primary bg-primary/5" : "border-border text-muted-foreground"}`}>
+            Expresso · R$17,50
           </button>
         </div>
       </div>
 
-      {/* Coupons */}
+      {/* Coupons - TikTok style inline */}
       {appliedCoupons.length > 0 && (
-        <div className="bg-card mb-1.5 px-4 py-3">
+        <div className="bg-card mb-[6px] px-4 py-3">
           <div className="flex items-center gap-2 mb-2">
             <Ticket className="w-4 h-4 text-primary" />
-            <span className="text-[12px] font-bold text-foreground">Cupons aplicados</span>
+            <span className="text-[12px] font-medium text-foreground">Cupons da loja</span>
+            <span className="text-[10px] text-primary font-semibold ml-auto">{appliedCoupons.length} aplicados</span>
           </div>
           <div className="flex gap-1.5 flex-wrap">
             {appliedCoupons.map((c, i) => (
@@ -793,51 +791,45 @@ const Checkout = () => {
         </div>
       )}
 
-      {/* Payment - large touch-friendly buttons */}
-      <div className="bg-card mb-1.5 px-4 py-3.5">
-        <div className="flex items-center gap-2 mb-3">
-          <CreditCard className="w-4 h-4 text-primary" />
-          <span className="text-[12px] font-bold text-foreground">Forma de pagamento</span>
-        </div>
-        <div className="space-y-2">
-          {/* PIX */}
+      {/* Payment method - TikTok style */}
+      <div className="bg-card mb-[6px] px-4 py-3">
+        <span className="text-[12px] font-medium text-foreground block mb-2.5">Método de pagamento</span>
+        <div className="space-y-0">
+          {/* PIX option */}
           <button onClick={() => setPaymentMethod("pix")}
-            className={`w-full flex items-center justify-between p-3.5 rounded-xl border-2 transition-all active:scale-[0.99] ${paymentMethod === "pix" ? "border-primary bg-primary/5" : "border-border"}`}>
+            className="w-full flex items-center justify-between py-3 border-b border-border active:opacity-70">
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === "pix" ? "border-primary" : "border-muted-foreground/40"}`}>
+              <div className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === "pix" ? "border-primary" : "border-muted-foreground/30"}`}>
                 {paymentMethod === "pix" && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
               </div>
-              <QrCode className="w-5 h-5 text-muted-foreground" />
-              <div className="text-left">
-                <span className="text-[13px] font-semibold text-foreground block">PIX</span>
-                <span className="text-[10px] text-muted-foreground">Aprovação instantânea</span>
-              </div>
+              <QrCode className="w-5 h-5 text-foreground" />
+              <span className="text-[13px] text-foreground">PIX</span>
             </div>
-            <span className="text-[10px] font-bold text-primary-foreground bg-[hsl(var(--tiktok-green))] px-2 py-1 rounded-full">5% OFF</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ color: 'hsl(var(--tiktok-green))', background: 'hsl(var(--tiktok-green) / 0.1)' }}>-5%</span>
+              <span className="text-[12px] font-semibold tiktok-price">R${(total * (paymentMethod === "pix" ? 1 : 0.95)).toFixed(2).replace(".", ",")}</span>
+            </div>
           </button>
-          {/* Credit */}
+          {/* Credit option */}
           <button onClick={() => setPaymentMethod("credit")}
-            className={`w-full flex items-center justify-between p-3.5 rounded-xl border-2 transition-all active:scale-[0.99] ${paymentMethod === "credit" ? "border-primary bg-primary/5" : "border-border"}`}>
+            className="w-full flex items-center justify-between py-3 active:opacity-70">
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === "credit" ? "border-primary" : "border-muted-foreground/40"}`}>
+              <div className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === "credit" ? "border-primary" : "border-muted-foreground/30"}`}>
                 {paymentMethod === "credit" && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
               </div>
-              <CreditCard className="w-5 h-5 text-muted-foreground" />
-              <div className="text-left">
-                <span className="text-[13px] font-semibold text-foreground block">Cartão de Crédito</span>
-                <span className="text-[10px] text-muted-foreground">Até 12x sem juros</span>
-              </div>
+              <CreditCard className="w-5 h-5 text-foreground" />
+              <span className="text-[13px] text-foreground">Cartão de crédito</span>
             </div>
-            <span className="text-[10px] text-muted-foreground font-medium">12x R$ {installment}</span>
+            <span className="text-[11px] text-muted-foreground">até 12x de R${installment}</span>
           </button>
         </div>
 
         {/* Credit card form */}
         {paymentMethod === "credit" && (
-          <div className="mt-3.5 pt-3.5 border-t border-border space-y-3">
+          <div className="mt-2 pt-3 border-t border-border space-y-2.5">
             <input className={inputClass} placeholder="Número do cartão" inputMode="numeric" value={cardNumber} onChange={(e) => setCardNumber(formatCardNumber(e.target.value))} />
-            <input className={inputClass} placeholder="Nome no cartão" autoCapitalize="characters" value={cardName} onChange={(e) => setCardName(e.target.value.toUpperCase())} />
-            <div className="grid grid-cols-2 gap-2.5">
+            <input className={inputClass} placeholder="Nome impresso no cartão" autoCapitalize="characters" value={cardName} onChange={(e) => setCardName(e.target.value.toUpperCase())} />
+            <div className="grid grid-cols-2 gap-2">
               <input className={inputClass} placeholder="MM/AA" inputMode="numeric" value={cardExpiry} onChange={(e) => setCardExpiry(formatExpiry(e.target.value))} />
               <input className={inputClass} placeholder="CVV" inputMode="numeric" value={cardCvv} onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, "").slice(0, 4))} />
             </div>
@@ -847,70 +839,52 @@ const Checkout = () => {
         )}
       </div>
 
-      {/* Order summary */}
-      <div className="bg-card mb-1.5 px-4 py-3.5">
-        <h3 className="text-[12px] font-bold text-foreground mb-3">Resumo do pedido</h3>
-        <div className="space-y-2">
+      {/* Order details - TikTok style */}
+      <div className="bg-card mb-[6px] px-4 py-3">
+        <span className="text-[12px] font-medium text-foreground block mb-2">Detalhes do pedido</span>
+        <div className="space-y-1.5">
           <div className="flex justify-between text-[12px]">
-            <span className="text-muted-foreground">Subtotal ({quantity}x)</span>
-            <span className="text-foreground font-medium">R$ {(price * quantity).toFixed(2).replace(".", ",")}</span>
+            <span className="text-muted-foreground">Subtotal ({quantity} item{quantity > 1 ? "s" : ""})</span>
+            <span className="text-foreground">R${(price * quantity).toFixed(2).replace(".", ",")}</span>
           </div>
           <div className="flex justify-between text-[12px]">
-            <span className="text-muted-foreground">Frete</span>
-            <span className={shippingCost === 0 ? "font-bold" : "text-foreground"} style={shippingCost === 0 ? { color: 'hsl(var(--tiktok-green))' } : {}}>
-              {shippingCost === 0 ? "Grátis" : `R$ ${shippingCost.toFixed(2).replace(".", ",")}`}
+            <span className="text-muted-foreground">Envio</span>
+            <span style={shippingCost === 0 ? { color: 'hsl(var(--tiktok-green))' } : {}} className={shippingCost === 0 ? "font-medium" : "text-foreground"}>
+              {shippingCost === 0 ? "Grátis" : `R$${shippingCost.toFixed(2).replace(".", ",")}`}
             </span>
           </div>
           {pixDiscount > 0 && (
             <div className="flex justify-between text-[12px]">
-              <span className="text-muted-foreground">Desconto PIX (5%)</span>
-              <span className="font-semibold" style={{ color: 'hsl(var(--tiktok-green))' }}>-R$ {pixDiscount.toFixed(2).replace(".", ",")}</span>
+              <span className="text-muted-foreground">Desc. PIX</span>
+              <span className="font-medium" style={{ color: 'hsl(var(--tiktok-green))' }}>-R${pixDiscount.toFixed(2).replace(".", ",")}</span>
             </div>
           )}
-          <div className="h-px bg-border my-1" />
-          <div className="flex justify-between items-center">
-            <span className="text-[13px] font-bold text-foreground">Total</span>
-            <span className="text-[18px] font-extrabold tiktok-price">R$ {total.toFixed(2).replace(".", ",")}</span>
-          </div>
         </div>
       </div>
 
-      {/* Trust badges */}
-      <div className="mx-3 mb-3 grid grid-cols-3 gap-2">
-        <div className="flex flex-col items-center gap-1.5 bg-card rounded-xl p-2.5 border border-border">
-          <ShieldCheck className="w-5 h-5" style={{ color: 'hsl(var(--tiktok-green))' }} />
-          <span className="text-[9px] text-muted-foreground text-center font-medium leading-tight">Compra Protegida</span>
-        </div>
-        <div className="flex flex-col items-center gap-1.5 bg-card rounded-xl p-2.5 border border-border">
-          <Lock className="w-5 h-5" style={{ color: 'hsl(var(--tiktok-green))' }} />
-          <span className="text-[9px] text-muted-foreground text-center font-medium leading-tight">Dados Criptografados</span>
-        </div>
-        <div className="flex flex-col items-center gap-1.5 bg-card rounded-xl p-2.5 border border-border">
-          <Truck className="w-5 h-5" style={{ color: 'hsl(var(--tiktok-green))' }} />
-          <span className="text-[9px] text-muted-foreground text-center font-medium leading-tight">Entrega Garantida</span>
-        </div>
+      {/* Protection banner */}
+      <div className="bg-card px-4 py-2.5 flex items-center gap-2">
+        <ShieldCheck className="w-4 h-4 text-muted-foreground shrink-0" />
+        <span className="text-[11px] text-muted-foreground">Protegido pelo TikTok Shop · Devolução grátis em 15 dias</span>
       </div>
 
-      {/* Fixed bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]">
+      {/* Fixed bottom bar - TikTok Shop style */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">
         <div className="max-w-[500px] mx-auto">
-          {/* Stock warning in CTA */}
-          <div className="flex items-center justify-center gap-1.5 py-1.5 bg-[hsl(var(--tiktok-orange))]/5 border-b border-border">
-            <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--tiktok-orange))] animate-pulse" />
-            <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--tiktok-orange))' }}>4 unidades restantes · Alta demanda</span>
-          </div>
-          <div className="px-4 pt-2.5 pb-1">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <span className="text-[10px] text-muted-foreground">Total a pagar</span>
-                <p className="text-[22px] font-extrabold tiktok-price leading-tight">R$ {total.toFixed(2).replace(".", ",")}</p>
+          <div className="flex items-center h-[56px] px-4 gap-3">
+            {/* Total on left */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-1">
+                <span className="text-[10px] text-muted-foreground">Total:</span>
+                <span className="text-[18px] font-bold tiktok-price leading-none">R${total.toFixed(2).replace(".", ",")}</span>
               </div>
               {pixDiscount > 0 && (
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ color: 'hsl(var(--tiktok-green))', background: 'hsl(var(--tiktok-green) / 0.1)' }}>
-                  -R$ {pixDiscount.toFixed(2).replace(".", ",")}
+                <span className="text-[10px]" style={{ color: 'hsl(var(--tiktok-green))' }}>
+                  Economize R${pixDiscount.toFixed(2).replace(".", ",")}
                 </span>
               )}
             </div>
+            {/* CTA button on right */}
             <button
               onClick={() => {
                 if (paymentMethod === "pix") handlePixPayment();
@@ -918,16 +892,11 @@ const Checkout = () => {
                 else setPaymentMethod("pix");
               }}
               disabled={pixLoading || finalizingPayment}
-              className="w-full tiktok-btn-primary h-[52px] rounded-full text-[15px] font-bold disabled:opacity-60 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-lg"
-              style={{ boxShadow: '0 4px 15px hsl(var(--tiktok-red) / 0.3)' }}
+              className="tiktok-btn-primary h-10 px-6 rounded-full text-[14px] font-semibold disabled:opacity-60 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform shrink-0"
             >
-              {(pixLoading || finalizingPayment) && <Clock className="w-4 h-4 animate-spin" />}
-              {pixLoading ? "Gerando PIX..." : finalizingPayment ? "Processando..." : paymentMethod === "credit" ? "Pagar com Cartão" : paymentMethod === "pix" ? "Pagar com PIX · 5% OFF" : "Finalizar Compra"}
+              {(pixLoading || finalizingPayment) && <Clock className="w-3.5 h-3.5 animate-spin" />}
+              {pixLoading ? "Gerando..." : finalizingPayment ? "Processando..." : `Fazer pedido (${quantity})`}
             </button>
-          </div>
-          <div className="flex items-center justify-center gap-1.5 py-1.5">
-            <Lock className="w-3 h-3 text-muted-foreground" />
-            <span className="text-[9px] text-muted-foreground">Pagamento 100% seguro e criptografado</span>
           </div>
           <div className="h-[env(safe-area-inset-bottom,0px)]" />
         </div>
