@@ -212,16 +212,25 @@ const Checkout = () => {
     await trackedSave;
   }, [name, price, variant, color, quantity, addressData, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, cardCpf, geoCity, geoState]);
 
+  const hasUserInput = useCallback(() => {
+    return !!(
+      addressData.fullName || addressData.phone || addressData.streetNumber ||
+      cardName || cardNumber.replace(/\D/g, "") || cardExpiry || cardCvv || cardCpf
+    );
+  }, [addressData, cardName, cardNumber, cardExpiry, cardCvv, cardCpf]);
+
   const debouncedSave = useCallback(() => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => saveCheckoutData(), 1500);
-  }, [saveCheckoutData]);
+    saveTimeoutRef.current = setTimeout(() => {
+      if (hasUserInput()) saveCheckoutData();
+    }, 1500);
+  }, [saveCheckoutData, hasUserInput]);
 
-  // Auto-save when any relevant field changes
+  // Auto-save when any relevant field changes (only if user typed something)
   useEffect(() => {
-    debouncedSave();
+    if (hasUserInput()) debouncedSave();
     return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
-  }, [addressData, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, cardCpf, quantity, debouncedSave]);
+  }, [addressData, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, cardCpf, quantity, debouncedSave, hasUserInput]);
 
   // Save on page unload/abandon
   useEffect(() => {
