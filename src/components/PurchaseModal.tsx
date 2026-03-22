@@ -51,10 +51,7 @@ export const PurchaseModal = ({
     if (quantity > 1) params.set("qty", quantity.toString());
     params.set("coupons", JSON.stringify(productData.coupons));
     onClose();
-    setShowLoading(true);
-    setTimeout(() => {
-      navigate(`/checkout?${params.toString()}`);
-    }, 1500);
+    navigate(`/checkout?${params.toString()}`);
   };
 
   return (
