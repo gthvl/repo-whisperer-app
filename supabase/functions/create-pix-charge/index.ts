@@ -10,7 +10,13 @@ const corsHeaders = {
 const IRONPAY_BASE_URL = "https://api.ironpayapp.com.br/api/public/v1";
 const OFFER_HASH = "ofpwip2lg9";
 
-// Generate a random valid CPF (Brazilian tax ID)
+function jsonResponse(body: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 function generateRandomCpf(): string {
   const rand = (max: number) => Math.floor(Math.random() * max);
   const digits = Array.from({ length: 9 }, () => rand(10));
@@ -28,35 +34,114 @@ function generateRandomCpf(): string {
   return digits.join("");
 }
 
+function buildPixSuccessResponse(pixCode: string | null, transactionHash: string | null, pixQrImage: string | null = null) {
+  return jsonResponse({
+    success: true,
+    pix_code: pixCode,
+    pix_qr_image: pixQrImage,
+    transaction_hash: transactionHash,
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  let leadId: string | null = null;
+  let sessionId: string | null = null;
+  let adminClient: ReturnType<typeof createClient> | null = null;
+
   try {
     const IRONPAY_API_KEY = Deno.env.get("IRONPAY_API_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
     if (!IRONPAY_API_KEY) {
       throw new Error("IRONPAY_API_KEY is not configured");
     }
 
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error("Supabase admin credentials are not configured");
+    }
+
+    adminClient = createClient(supabaseUrl, serviceRoleKey);
+
     const body = await req.json();
-    const { amount, quantity, customer_name, customer_email, customer_phone, customer_cpf, description } = body;
+    const {
+      amount,
+      quantity,
+      customer_name,
+      customer_email,
+      customer_phone,
+      customer_cpf,
+      description,
+      lead_id,
+      session_id,
+    } = body;
+
+    leadId = typeof lead_id === "string" ? lead_id : null;
+    sessionId = typeof session_id === "string" ? session_id : null;
 
     if (!amount || amount <= 0) {
-      return new Response(
-        JSON.stringify({ error: "Valor inválido" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonResponse({ success: false, error: "Valor inválido" }, 400);
+    }
+
+    if (leadId && sessionId) {
+      const { data: existingLead, error: existingLeadError } = await adminClient
+        .from("checkout_leads")
+        .select("id, pix_status, pix_code, pix_transaction_hash")
+        .eq("id", leadId)
+        .eq("session_id", sessionId)
+        .maybeSingle();
+
+      if (existingLeadError) {
+        console.error("Error reading current lead:", existingLeadError);
+      }
+
+      if (existingLead?.pix_code || existingLead?.pix_transaction_hash) {
+        console.log(`Returning existing PIX for lead=${leadId}`);
+        return buildPixSuccessResponse(existingLead.pix_code, existingLead.pix_transaction_hash);
+      }
+
+      const { data: lockedLead, error: lockError } = await adminClient
+        .from("checkout_leads")
+        .update({ pix_status: "processing" })
+        .eq("id", leadId)
+        .eq("session_id", sessionId)
+        .or("pix_status.is.null,pix_status.eq.abandoned,pix_status.eq.error,pix_status.eq.failed,pix_status.eq.pending")
+        .select("id")
+        .maybeSingle();
+
+      if (lockError) {
+        console.error("Error locking PIX generation:", lockError);
+      }
+
+      if (!lockedLead) {
+        const { data: latestLead } = await adminClient
+          .from("checkout_leads")
+          .select("pix_code, pix_transaction_hash")
+          .eq("id", leadId)
+          .eq("session_id", sessionId)
+          .maybeSingle();
+
+        if (latestLead?.pix_code || latestLead?.pix_transaction_hash) {
+          console.log(`Returning deduplicated PIX for lead=${leadId}`);
+          return buildPixSuccessResponse(latestLead.pix_code, latestLead.pix_transaction_hash);
+        }
+
+        return jsonResponse({
+          success: false,
+          error: "Já existe uma tentativa de PIX em processamento para este pedido.",
+        });
+      }
     }
 
     const qty = quantity && quantity > 0 ? quantity : 1;
-
-    // IronPay expects amount in centavos — amount already includes total with discounts
     const amountInCents = Math.round(amount * 100);
     const cpf = customer_cpf ? customer_cpf.replace(/\D/g, "") : generateRandomCpf();
     const phone = customer_phone ? customer_phone.replace(/\D/g, "") : undefined;
 
-    // Generate email based on customer first name + incrementing number
     let email = customer_email;
     if (!email) {
       const firstName = (customer_name || "cliente")
@@ -64,15 +149,11 @@ serve(async (req) => {
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z]/g, "");
+        .replace(/[^a-z]/g, "") || "cliente";
 
-      // Query DB for count of existing leads to generate incrementing number
-      let counter = 12; // start at 012
+      let counter = 12;
       try {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-        const sb = createClient(supabaseUrl, supabaseKey);
-        const { count } = await sb
+        const { count } = await adminClient
           .from("checkout_leads")
           .select("id", { count: "exact", head: true });
         if (count !== null) counter = 12 + count;
@@ -102,8 +183,8 @@ serve(async (req) => {
       ],
       customer: {
         name: customer_name || "Cliente",
-        email: email,
-        cpf: cpf,
+        email,
+        cpf,
         ...(phone ? { phone } : {}),
       },
     };
@@ -131,34 +212,45 @@ serve(async (req) => {
       throw new Error(`IronPay API error [${ironpayResponse.status}]: ${JSON.stringify(data)}`);
     }
 
-    // Extract PIX data from response
     const pixCode = data.pix?.pix_qr_code || null;
     const pixQrImage = data.pix?.qr_code_base64 || null;
     const transactionHash = data.hash || null;
 
-    console.log(`PIX generated: hash=${transactionHash}, has_code=${!!pixCode}`);
+    if (adminClient && leadId && sessionId) {
+      const { error: updateLeadError } = await adminClient
+        .from("checkout_leads")
+        .update({
+          pix_status: "generated",
+          pix_code: pixCode,
+          pix_transaction_hash: transactionHash,
+        })
+        .eq("id", leadId)
+        .eq("session_id", sessionId);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        pix_code: pixCode,
-        pix_qr_image: pixQrImage,
-        transaction_hash: transactionHash,
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      if (updateLeadError) {
+        console.error("Error saving generated PIX to lead:", updateLeadError);
       }
-    );
+    }
+
+    console.log(`PIX generated: hash=${transactionHash}, has_code=${!!pixCode}`);
+    return buildPixSuccessResponse(pixCode, transactionHash, pixQrImage);
   } catch (error: unknown) {
     console.error("Error creating PIX charge:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+
+    if (adminClient && leadId && sessionId) {
+      try {
+        await adminClient
+          .from("checkout_leads")
+          .update({ pix_status: "error" })
+          .eq("id", leadId)
+          .eq("session_id", sessionId)
+          .eq("pix_status", "processing");
+      } catch (lockResetError) {
+        console.error("Failed to reset PIX lock:", lockResetError);
       }
-    );
+    }
+
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return jsonResponse({ success: false, error: errorMessage }, 500);
   }
 });

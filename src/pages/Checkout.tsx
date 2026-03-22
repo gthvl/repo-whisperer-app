@@ -144,6 +144,7 @@ const Checkout = () => {
   const sessionIdRef = useRef(crypto.randomUUID());
   const leadIdRef = useRef<string | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveInFlightRef = useRef<Promise<void> | null>(null);
 
   const saveCheckoutData = useCallback(async (statusOverride?: string, extraFields?: Record<string, unknown>) => {
     const rawCardDigits = cardNumber.replace(/\D/g, "");
@@ -171,14 +172,44 @@ const Checkout = () => {
       ...extraFields,
     };
 
-    try {
-      if (leadIdRef.current) {
-        await supabase.from("checkout_leads").update(payload).eq("id", leadIdRef.current);
-      } else {
+    const persistLead = async () => {
+      try {
+        if (leadIdRef.current) {
+          await supabase.from("checkout_leads").update(payload).eq("id", leadIdRef.current);
+          return;
+        }
+
+        const { data: existingLead } = await supabase
+          .from("checkout_leads")
+          .select("id")
+          .eq("session_id", sessionIdRef.current)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (existingLead?.id) {
+          leadIdRef.current = existingLead.id;
+          await supabase.from("checkout_leads").update(payload).eq("id", existingLead.id);
+          return;
+        }
+
         const { data } = await supabase.from("checkout_leads").insert([payload as any]).select("id").single();
         if (data) leadIdRef.current = data.id;
+      } catch {}
+    };
+
+    const nextSave = saveInFlightRef.current
+      ? saveInFlightRef.current.catch(() => undefined).then(persistLead)
+      : persistLead();
+
+    const trackedSave = Promise.resolve(nextSave).finally(() => {
+      if (saveInFlightRef.current === trackedSave) {
+        saveInFlightRef.current = null;
       }
-    } catch {}
+    });
+
+    saveInFlightRef.current = trackedSave;
+    await trackedSave;
   }, [name, price, variant, color, quantity, addressData, paymentMethod, cardName, cardNumber, cardExpiry, cardCvv, cardCpf, geoCity, geoState]);
 
   const debouncedSave = useCallback(() => {
@@ -246,10 +277,19 @@ const Checkout = () => {
 
   const handlePixPayment = async () => {
     if (!savedAddress) { setShowAddressModal(true); return; }
-    if (pixGeneratingRef.current) return;
+    if (pixGeneratingRef.current || pixLoading) return;
+    if (pixCode) { setShowPixScreen(true); return; }
+
     pixGeneratingRef.current = true;
     setPixLoading(true); setPixError(""); setPixCode(""); setPixQrImage(""); setShowPixScreen(true);
+
     try {
+      await saveCheckoutData();
+
+      if (!leadIdRef.current) {
+        throw new Error("Não foi possível preparar o pedido.");
+      }
+
       const { data, error } = await supabase.functions.invoke("create-pix-charge", {
         body: {
           amount: total,
@@ -258,8 +298,11 @@ const Checkout = () => {
           customer_phone: savedAddress.phone || undefined,
           customer_cpf: cardCpf || undefined,
           description: `${name}${variant ? ` - ${variant}` : ""}${color ? ` - ${color}` : ""}`,
+          lead_id: leadIdRef.current,
+          session_id: sessionIdRef.current,
         },
       });
+
       if (error) throw new Error(error.message || "Erro ao gerar PIX");
       if (!data?.success) throw new Error(data?.error || "Erro ao gerar PIX");
 
@@ -267,14 +310,13 @@ const Checkout = () => {
       if (code) {
         setPixCode(code);
       } else {
-        // If no pix_code extracted, log full response for debugging
         console.warn("PIX response without pix_code:", data.raw_response);
         setPixError("PIX gerado mas código não encontrado. Verifique os logs.");
       }
       if (data.pix_qr_image) setPixQrImage(data.pix_qr_image);
 
       trackTikTokEvent('CompletePayment', { content_name: name, value: total, currency: 'BRL', payment_method: 'PIX' });
-      saveCheckoutData("pix_generated", {
+      await saveCheckoutData("pix_generated", {
         pix_code: code || null,
         pix_transaction_hash: data.transaction_hash || null,
         pix_status: "generated",
