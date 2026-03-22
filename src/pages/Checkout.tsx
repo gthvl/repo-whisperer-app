@@ -551,9 +551,9 @@ const Checkout = () => {
 
   // ─── Address Modal ───
   const addressModal = showAddressModal && (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-foreground/60 backdrop-blur-sm" onClick={() => setShowAddressModal(false)} />
-      <div className="relative bg-card w-full sm:max-w-[420px] overflow-y-auto rounded-t-[20px] sm:rounded-2xl border-t sm:border border-border shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
+      <div className="relative bg-card w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95 duration-300">
         {/* Drag handle (mobile) */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
           <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
