@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X, Minus, Plus } from "lucide-react";
 import { productData } from "@/data/productData";
-import { createPortal } from "react-dom";
-import tiktokShopIcon from "@/assets/tiktok-shop-icon.png";
+
 
 interface Variant {
   name: string;
@@ -33,21 +32,7 @@ export const PurchaseModal = ({
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
-  const [showLoading, setShowLoading] = useState(false);
-
-  const loadingOverlay = showLoading && createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background/95 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-5">
-        <img src={tiktokShopIcon} alt="" className="w-16 h-16 animate-spin object-contain" />
-        <span className="text-[15px] font-bold text-foreground">TikTok Shop</span>
-        <span className="text-[12px] text-muted-foreground animate-pulse">Carregando checkout...</span>
-      </div>
-    </div>,
-    document.body
-  );
-
-  if (!isOpen && !showLoading) return null;
-  if (!isOpen && showLoading) return <>{loadingOverlay}</>;
+  if (!isOpen) return null;
 
   const currentPrice = variants[selectedVariant].price;
   const pixDiscountedPrice = parseFloat((currentPrice * 0.95).toFixed(2));
@@ -65,10 +50,7 @@ export const PurchaseModal = ({
     if (quantity > 1) params.set("qty", quantity.toString());
     params.set("coupons", JSON.stringify(productData.coupons));
     onClose();
-    setShowLoading(true);
-    setTimeout(() => {
-      navigate(`/checkout?${params.toString()}`);
-    }, 1500);
+    navigate(`/checkout?${params.toString()}`);
   };
 
   return (
