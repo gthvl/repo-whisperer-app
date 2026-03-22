@@ -242,17 +242,22 @@ const Checkout = () => {
     setShowAddressModal(false);
   };
 
+  const pixGeneratingRef = useRef(false);
+
   const handlePixPayment = async () => {
     if (!savedAddress) { setShowAddressModal(true); return; }
+    if (pixGeneratingRef.current) return;
+    pixGeneratingRef.current = true;
     setPixLoading(true); setPixError(""); setPixCode(""); setPixQrImage(""); setShowPixScreen(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-pix-charge", {
         body: {
           amount: total,
+          quantity,
           customer_name: savedAddress.fullName,
           customer_phone: savedAddress.phone || undefined,
           customer_cpf: cardCpf || undefined,
-          description: `${name} - ${variant} - ${color}`,
+          description: `${name}${variant ? ` - ${variant}` : ""}${color ? ` - ${color}` : ""}`,
         },
       });
       if (error) throw new Error(error.message || "Erro ao gerar PIX");
