@@ -59,7 +59,7 @@ const Checkout = () => {
   const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
 
   const [quantity, setQuantity] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit" | null>("pix");
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit" | null>(null);
   const [shippingMethod, setShippingMethod] = useState<"standard" | "premium">("standard");
 
   const [cardNumber, setCardNumber] = useState("");
