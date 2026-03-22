@@ -19,8 +19,8 @@ interface PurchaseModalProps {
 }
 
 const colorOptions = [
-  { name: "Preto", image: "/images/sofa-1.jpeg", price: 79.90, originalPrice: 249.93 },
-  { name: "Cinza", image: "/images/sofa-cinza.webp", price: 79.90, originalPrice: 249.93 },
+  { name: "Preto", image: "/images/sofa-1.jpeg", price: 37.90, originalPrice: 249.93 },
+  { name: "Cinza", image: "/images/sofa-cinza.webp", price: 37.90, originalPrice: 249.93 },
 ];
 
 export const PurchaseModal = ({
