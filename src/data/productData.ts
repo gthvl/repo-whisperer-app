@@ -113,6 +113,7 @@ export const productData: ProductData = {
       date: "01/28/2025",
       text: "Sofá muito bem construído e resistente. Valeu a pena!",
       images: ["/images/review-4.png"],
+    },
     {
       id: 4,
       author: "i*d*",
