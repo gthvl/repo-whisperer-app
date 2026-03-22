@@ -104,16 +104,21 @@ const Checkout = () => {
     });
   }, []);
 
-  const [countdown, setCountdown] = useState(9 * 60);
+  const [countdown, setCountdown] = useState(4 * 60 + 59);
   useEffect(() => {
+    if (countdown <= 0) return;
     const timer = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+      setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
-  const countdownMin = String(Math.floor(countdown / 60)).padStart(2, "0");
-  const countdownSec = String(countdown % 60).padStart(2, "0");
-  const countdownDisplay = `${countdownMin}:${countdownSec}`;
+  }, [countdown]);
+  const formatTime = (s: number) => {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  };
+  const countdownDisplay = formatTime(countdown);
 
   const [showAddressModal, setShowAddressModal] = useState(false);
   const { city: geoCity, state: geoState, locationLabel } = useGeoLocation();
