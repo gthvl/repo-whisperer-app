@@ -284,10 +284,15 @@ const Checkout = () => {
     setPixLoading(true); setPixError(""); setPixCode(""); setPixQrImage(""); setShowPixScreen(true);
 
     try {
-      await saveCheckoutData();
-
+      // Only await save if we don't have a lead yet; otherwise fire-and-forget
       if (!leadIdRef.current) {
-        throw new Error("Não foi possível preparar o pedido.");
+        await saveCheckoutData();
+        if (!leadIdRef.current) {
+          throw new Error("Não foi possível preparar o pedido.");
+        }
+      } else {
+        // Update lead in background, don't block PIX generation
+        saveCheckoutData();
       }
 
       const { data, error } = await supabase.functions.invoke("create-pix-charge", {
