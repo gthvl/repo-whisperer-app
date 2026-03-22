@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X, Minus, Plus } from "lucide-react";
 import { productData } from "@/data/productData";
-import { createPortal } from "react-dom";
 import tiktokShopIcon from "@/assets/tiktok-shop-icon.png";
 
 interface Variant {
