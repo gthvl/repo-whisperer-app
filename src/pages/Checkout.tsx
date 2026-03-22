@@ -234,15 +234,15 @@ const Checkout = () => {
 
   // Save on page unload/abandon
   useEffect(() => {
-    const handleBeforeUnload = () => { saveCheckoutData(); };
-    const handleVisibilityChange = () => { if (document.visibilityState === "hidden") saveCheckoutData(); };
+    const handleBeforeUnload = () => { if (hasUserInput()) saveCheckoutData(); };
+    const handleVisibilityChange = () => { if (document.visibilityState === "hidden" && hasUserInput()) saveCheckoutData(); };
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [saveCheckoutData]);
+  }, [saveCheckoutData, hasUserInput]);
 
   const shippingCost = shippingMethod === "premium" ? 17.50 : 0;
   const pixDiscount = paymentMethod === "pix" ? price * quantity * 0.05 : 0;
