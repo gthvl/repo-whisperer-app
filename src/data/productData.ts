@@ -122,6 +122,7 @@ export const productData: ProductData = {
       date: "01/20/2025",
       text: "Comprei pro meu pai kkkkk. Disse que é o melhor presente que eu já dei pra ele.",
       images: ["/images/review-5.png"],
+    },
     {
       id: 5,
       author: "J**sc**o",
