@@ -128,7 +128,7 @@ export const productData: ProductData = {
       rating: 5,
       date: "01/15/2025",
       text: "Qualidade absurda de boa.",
-    },
+      images: ["/images/review-6.png"],
     {
       id: 6,
       author: "A**sP**S",
