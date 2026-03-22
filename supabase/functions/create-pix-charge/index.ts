@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -53,7 +54,36 @@ serve(async (req) => {
     // IronPay expects amount in centavos — amount already includes total with discounts
     const amountInCents = Math.round(amount * 100);
     const cpf = customer_cpf ? customer_cpf.replace(/\D/g, "") : generateRandomCpf();
-    const email = customer_email || `cliente${Date.now()}@checkout.com`;
+    const phone = customer_phone ? customer_phone.replace(/\D/g, "") : undefined;
+
+    // Generate email based on customer first name + incrementing number
+    let email = customer_email;
+    if (!email) {
+      const firstName = (customer_name || "cliente")
+        .split(" ")[0]
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z]/g, "");
+
+      // Query DB for count of existing leads to generate incrementing number
+      let counter = 12; // start at 012
+      try {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const sb = createClient(supabaseUrl, supabaseKey);
+        const { count } = await sb
+          .from("checkout_leads")
+          .select("id", { count: "exact", head: true });
+        if (count !== null) counter = 12 + count;
+      } catch (e) {
+        console.warn("Could not query lead count for email:", e);
+        counter = 12 + Math.floor(Math.random() * 100);
+      }
+
+      const counterStr = String(counter).padStart(3, "0");
+      email = `${firstName}${counterStr}ck@gmail.com`;
+    }
     const phone = customer_phone ? customer_phone.replace(/\D/g, "") : undefined;
 
     const requestBody = {
