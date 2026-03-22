@@ -112,6 +112,7 @@ export const productData: ProductData = {
       rating: 5,
       date: "01/28/2025",
       text: "Sofá muito bem construído e resistente. Valeu a pena!",
+      images: ["/images/review-4.png"],
     },
     {
       id: 4,
@@ -120,6 +121,7 @@ export const productData: ProductData = {
       rating: 4,
       date: "01/20/2025",
       text: "Comprei pro meu pai kkkkk. Disse que é o melhor presente que eu já dei pra ele.",
+      images: ["/images/review-5.png"],
     },
     {
       id: 5,
@@ -128,6 +130,7 @@ export const productData: ProductData = {
       rating: 5,
       date: "01/15/2025",
       text: "Qualidade absurda de boa.",
+      images: ["/images/review-6.png"],
     },
     {
       id: 6,
