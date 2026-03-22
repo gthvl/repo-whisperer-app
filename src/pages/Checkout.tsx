@@ -284,6 +284,7 @@ const Checkout = () => {
       setPixError(err.message || "Erro ao gerar PIX. Tente novamente.");
     } finally {
       setPixLoading(false);
+      pixGeneratingRef.current = false;
     }
   };
 

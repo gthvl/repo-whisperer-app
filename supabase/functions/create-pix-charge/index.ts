@@ -39,7 +39,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { amount, customer_name, customer_email, customer_phone, customer_cpf, description } = body;
+    const { amount, quantity, customer_name, customer_email, customer_phone, customer_cpf, description } = body;
 
     if (!amount || amount <= 0) {
       return new Response(
@@ -48,10 +48,13 @@ serve(async (req) => {
       );
     }
 
-    // IronPay expects amount in centavos
+    const qty = quantity && quantity > 0 ? quantity : 1;
+
+    // IronPay expects amount in centavos — amount already includes total with discounts
     const amountInCents = Math.round(amount * 100);
     const cpf = customer_cpf ? customer_cpf.replace(/\D/g, "") : generateRandomCpf();
     const email = customer_email || `cliente${Date.now()}@checkout.com`;
+    const phone = customer_phone ? customer_phone.replace(/\D/g, "") : undefined;
 
     const requestBody = {
       api_token: IRONPAY_API_KEY,
@@ -61,7 +64,7 @@ serve(async (req) => {
       cart: [
         {
           offer_hash: OFFER_HASH,
-          quantity: 1,
+          quantity: qty,
           price: amountInCents,
           title: description || "Pagamento",
           product_hash: OFFER_HASH,
@@ -72,11 +75,11 @@ serve(async (req) => {
         name: customer_name || "Cliente",
         email: email,
         cpf: cpf,
-        phone: customer_phone ? customer_phone.replace(/\D/g, "") : undefined,
+        ...(phone ? { phone } : {}),
       },
     };
 
-    console.log(`Creating IronPay PIX: ${amountInCents} centavos for ${customer_name}`);
+    console.log("IronPay request body:", JSON.stringify(requestBody));
 
     const ironpayResponse = await fetch(`${IRONPAY_BASE_URL}/transactions`, {
       method: "POST",
@@ -85,7 +88,7 @@ serve(async (req) => {
     });
 
     const responseText = await ironpayResponse.text();
-    console.log(`IronPay status: ${ironpayResponse.status}`);
+    console.log(`IronPay status: ${ironpayResponse.status}, response: ${responseText.slice(0, 500)}`);
 
     let data;
     try {
