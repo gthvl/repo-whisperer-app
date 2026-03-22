@@ -84,7 +84,6 @@ serve(async (req) => {
       const counterStr = String(counter).padStart(3, "0");
       email = `${firstName}${counterStr}ck@gmail.com`;
     }
-    const phone = customer_phone ? customer_phone.replace(/\D/g, "") : undefined;
 
     const requestBody = {
       api_token: IRONPAY_API_KEY,
