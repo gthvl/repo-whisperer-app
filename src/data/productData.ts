@@ -158,7 +158,7 @@ export const productData: ProductData = {
     "🏠 Ideal para sala de estar, sala de TV, quarto, apartamento ou porão.",
   ],
   specs: [
-    { label: "Marca", value: "Innovar" },
+    { label: "Marca", value: "Sofá Na Caixa" },
     { label: "Cor", value: "Preto" },
     { label: "Material", value: "Espuma de alta resiliência e veludo cotelê" },
     { label: "Formato", value: "L (lado direito)" },
