@@ -49,7 +49,7 @@ export interface ProductData {
 
 export const productData: ProductData = {
   title: "Sofá-Cama À Vácuo Cloud Montagem Rápida + Brinde Kit Proteção & Conforto (Capa Impermeável + Protetor de Colchão)",
-  price: 37.90,
+  price: 57.90,
   originalPrice: 249.93,
   discount: 68,
   rating: 4.9,
